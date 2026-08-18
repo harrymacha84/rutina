@@ -221,6 +221,21 @@
   .qty-row{display:flex;gap:10px;margin-bottom:9px;}
   .sf-preview{font-size:13px;font-weight:700;color:var(--ink);background:var(--surface);border-radius:9px;padding:9px 11px;}
 
+  .plate-box{
+    background:var(--surface);border:1px solid var(--line);border-radius:13px;
+    padding:12px 13px;margin-bottom:14px;
+  }
+  .plate-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
+  .plate-head span:first-child{font-size:11.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);}
+  .plate-head #plateTotal{font-size:13px;font-weight:800;color:var(--green);}
+  .plate-item{
+    display:flex;align-items:center;gap:9px;padding:8px 0;border-top:1px solid var(--line);
+  }
+  .plate-item:first-child{border-top:none;padding-top:0;}
+  .plate-item .pn{flex:1;min-width:0;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .plate-item .pk{font-size:13px;font-weight:800;color:var(--ink-soft);flex:none;}
+  .plate-item .pdel{flex:none;width:24px;height:24px;border:none;background:none;color:var(--ink-faint);font-size:14px;}
+
   .primary-btn{
     width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;
     padding:14px;font-size:15px;font-weight:800;letter-spacing:.01em;margin-top:4px;
@@ -354,6 +369,7 @@
         </div>
         <div class="chips" id="quickGrams"></div>
         <div class="sf-preview" id="sfPreview">≈ 0 kcal</div>
+        <button type="button" class="ghost-btn" id="addToPlateDb" style="margin-top:10px;">+ Sumar al plato y cargar otro</button>
       </div>
     </div>
 
@@ -387,6 +403,15 @@
           <input type="number" id="fFat" inputmode="decimal" placeholder="0">
         </label>
       </div>
+      <button type="button" class="ghost-btn" id="addToPlateManual">+ Sumar al plato y cargar otro</button>
+    </div>
+
+    <div id="plateBox" class="plate-box" style="display:none;">
+      <div class="plate-head">
+        <span>En este plato</span>
+        <span id="plateTotal" class="tabular"></span>
+      </div>
+      <div id="plateList"></div>
     </div>
 
     <label class="field">
@@ -409,7 +434,7 @@
     </label>
     <button class="primary-btn" id="saveEntry">Guardar registro</button>
     <span style="display:block;font-size:11px;color:var(--ink-faint);margin-top:8px;line-height:1.5;">
-      Los valores de la base son estimaciones orientativas por 100g (no un análisis de laboratorio). Si un alimento no está en la lista, usá "Carga manual".
+      Los valores de la base son estimaciones orientativas por 100g (no un análisis de laboratorio). Si un alimento no está en la lista, usá "Carga manual". Para una comida con varios alimentos (ej: bife con papas), usá "Sumar al plato" por cada uno y guardalos juntos.
     </span>
   </div>
 </div>
@@ -782,6 +807,7 @@
   /* ---------- add entry sheet ---------- */
   let entryMode = "db"; // "db" | "manual"
   let selectedFood = null;
+  let plate = []; // items sumados en la sesión de carga actual
 
   function setMode(mode){
     entryMode = mode;
@@ -856,9 +882,85 @@
     });
   });
 
+  // -- construir un item a partir del formulario activo (sin guardarlo aún) --
+  function buildItemFromForm(){
+    if(entryMode === "db"){
+      if(!selectedFood) return {error:"Buscá y elegí un alimento de la lista"};
+      const g = Number($("#fGrams").value);
+      if(!g || g<=0) return {error:"Cargá la cantidad en gramos"};
+      const factor = g/100;
+      return {item:{
+        name: selectedFood.n + " (" + g + "g)",
+        kcal: Math.round(selectedFood.k*factor*10)/10,
+        protein: Math.round(selectedFood.p*factor*10)/10,
+        carbs: Math.round(selectedFood.c*factor*10)/10,
+        fat: Math.round(selectedFood.f*factor*10)/10
+      }};
+    } else {
+      const name = $("#fNameManual").value.trim();
+      const kcal = Number($("#fKcal").value);
+      if(!name) return {error:"Poné el nombre del alimento"};
+      if(!kcal || kcal<=0) return {error:"Cargá las calorías"};
+      return {item:{
+        name, kcal,
+        protein: Number($("#fProt").value)||0,
+        carbs: Number($("#fCarb").value)||0,
+        fat: Number($("#fFat").value)||0
+      }};
+    }
+  }
+
+  function resetActiveFormFields(){
+    if(entryMode === "db"){
+      clearSelectedFood();
+    } else {
+      $("#fNameManual").value = "";
+      $("#fKcal").value = "";
+      $("#fProt").value = "";
+      $("#fCarb").value = "";
+      $("#fFat").value = "";
+      $("#fNameManual").focus();
+    }
+  }
+
+  function renderPlate(){
+    const box = $("#plateBox");
+    if(plate.length === 0){ box.style.display = "none"; return; }
+    box.style.display = "";
+    const total = plate.reduce((s,it)=> s+it.kcal, 0);
+    $("#plateTotal").textContent = Math.round(total) + " kcal";
+    const list = $("#plateList");
+    list.innerHTML = "";
+    plate.forEach((it, idx)=>{
+      const row = document.createElement("div");
+      row.className = "plate-item";
+      row.innerHTML = `<span class="pn">${escapeHtml(it.name)}</span><span class="pk tabular">${Math.round(it.kcal)}</span><button type="button" class="pdel" data-idx="${idx}">✕</button>`;
+      list.appendChild(row);
+    });
+    $all(".pdel", list).forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        plate.splice(Number(btn.dataset.idx), 1);
+        renderPlate();
+      });
+    });
+  }
+
+  function addCurrentToPlate(){
+    const res = buildItemFromForm();
+    if(res.error){ showToast(res.error); return false; }
+    plate.push(res.item);
+    renderPlate();
+    resetActiveFormFields();
+    return true;
+  }
+  $("#addToPlateDb").addEventListener("click", addCurrentToPlate);
+  $("#addToPlateManual").addEventListener("click", addCurrentToPlate);
+
   $("#fabAdd").addEventListener("click", ()=>{
     setMode("db");
     clearSelectedFood();
+    plate = [];
+    renderPlate();
     $("#fNameManual").value = "";
     $("#fKcal").value = "";
     $("#fTime").value = nowTime();
@@ -890,44 +992,33 @@
 
   $("#saveEntry").addEventListener("click", ()=>{
     const time = $("#fTime").value || nowTime();
-    let entry;
+    const notes = $("#fNotes").value.trim();
 
-    if(entryMode === "db"){
-      if(!selectedFood){ showToast("Buscá y elegí un alimento de la lista"); return; }
-      const g = Number($("#fGrams").value);
-      if(!g || g<=0){ showToast("Cargá la cantidad en gramos"); return; }
-      const factor = g/100;
-      entry = {
-        id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-        name: selectedFood.n + " (" + g + "g)",
-        kcal: Math.round(selectedFood.k*factor*10)/10,
-        time, meal: selectedMeal,
-        protein: Math.round(selectedFood.p*factor*10)/10,
-        carbs: Math.round(selectedFood.c*factor*10)/10,
-        fat: Math.round(selectedFood.f*factor*10)/10,
-        notes: $("#fNotes").value.trim(),
-        loggedAt: new Date().toISOString()
-      };
-    } else {
-      const name = $("#fNameManual").value.trim();
-      const kcal = Number($("#fKcal").value);
-      if(!name){ showToast("Poné el nombre del alimento"); return; }
-      if(!kcal || kcal <= 0){ showToast("Cargá las calorías"); return; }
-      entry = {
-        id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-        name, kcal,
-        time, meal: selectedMeal,
-        protein: Number($("#fProt").value)||0,
-        carbs: Number($("#fCarb").value)||0,
-        fat: Number($("#fFat").value)||0,
-        notes: $("#fNotes").value.trim(),
-        loggedAt: new Date().toISOString()
-      };
+    // si hay algo cargado en el formulario que todavía no se sumó al plato, lo sumamos ahora
+    const hasPendingDb = entryMode==="db" && selectedFood;
+    const hasPendingManual = entryMode==="manual" && ($("#fNameManual").value.trim() || Number($("#fKcal").value)>0);
+    if(hasPendingDb || hasPendingManual){
+      const res = buildItemFromForm();
+      if(res.item) plate.push(res.item);
+      else if(plate.length === 0){ showToast(res.error); return; }
     }
 
-    data[currentDate] = data[currentDate] || [];
-    data[currentDate].push(entry);
+    if(plate.length === 0){ showToast("Agregá al menos un alimento"); return; }
+
+    plate.forEach(it=>{
+      data[currentDate] = data[currentDate] || [];
+      data[currentDate].push({
+        id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+        name: it.name, kcal: it.kcal,
+        time, meal: selectedMeal,
+        protein: it.protein, carbs: it.carbs, fat: it.fat,
+        notes,
+        loggedAt: new Date().toISOString()
+      });
+    });
+
     saveData(data);
+    plate = [];
     closeSheet("addOverlay");
     render();
     showToast("Registrado ✓");
