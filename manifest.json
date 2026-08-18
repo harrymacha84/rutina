@@ -1,0 +1,25 @@
+{
+  "name": "Bitácora de Alimentación",
+  "short_name": "Bitácora",
+  "description": "Registro diario de comidas, horarios y calorías con exportación para análisis con IA",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F5EF",
+  "theme_color": "#465C3B",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23465C3B'/%3E%3Ctext x='96' y='128' font-size='96' text-anchor='middle' fill='%23F7F5EF' font-family='sans-serif'%3E%F0%9F%8D%BD%EF%B8%8F%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23465C3B'/%3E%3Ctext x='96' y='128' font-size='96' text-anchor='middle' fill='%23F7F5EF' font-family='sans-serif'%3E%F0%9F%8D%BD%EF%B8%8F%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
