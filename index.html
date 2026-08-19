@@ -276,6 +276,47 @@
   .hist-day .r{font-size:15px;font-weight:800;color:var(--green);text-align:right;}
   .hist-day .r span{display:block;font-size:10.5px;font-weight:600;color:var(--ink-soft);}
 
+  /* planes de día */
+  .plan-card{
+    background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--plan-color,var(--green));
+    border-radius:13px;padding:14px;margin-bottom:12px;
+  }
+  .plan-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .plan-name{font-size:15px;font-weight:800;color:var(--ink);}
+  .plan-tag{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .plan-kcal{font-size:18px;font-weight:800;color:var(--plan-color,var(--green));text-align:right;line-height:1.1;}
+  .plan-kcal span{display:block;font-size:10px;font-weight:600;color:var(--ink-soft);}
+  .plan-items{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;}
+  .plan-item{display:flex;align-items:center;gap:7px;font-size:12.5px;}
+  .plan-item .pi-meal{
+    flex:none;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;
+    color:var(--ink-soft);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px;
+    width:64px;text-align:center;
+  }
+  .plan-item .pi-name{flex:1;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .plan-item .gf-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--amber);}
+  .plan-macros{font-size:12px;color:var(--ink-soft);font-weight:600;}
+
+  /* lista de recetas */
+  .recipe-row{
+    display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:11px 12px;margin-bottom:8px;
+  }
+  .rr-main{flex:1;min-width:0;}
+  .rr-name{font-size:13.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .rr-macros{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .rr-note{font-size:11px;color:var(--amber);margin-top:2px;}
+  .rr-add{
+    flex:none;width:32px;height:32px;border-radius:10px;border:none;background:var(--green);
+    color:#fff;font-size:18px;line-height:0;
+  }
+  .gf-badge{
+    font-size:9.5px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;
+    padding:2px 7px;border-radius:999px;
+  }
+  .gf-badge.gf-ok{background:var(--green-soft);color:var(--green);}
+  .gf-badge.gf-swap{background:#F3E2C7;color:var(--amber);}
+
   ::selection{background:var(--green-soft);}
 </style>
 </head>
@@ -331,6 +372,7 @@
 
 <nav class="bottom">
   <button class="active" data-tab="today"><span class="ic">📋</span>Hoy</button>
+  <button data-tab="recipes"><span class="ic">📖</span>Recetas</button>
   <button data-tab="history"><span class="ic">🗓️</span>Historial</button>
   <button data-tab="export"><span class="ic">⇪</span>Exportar</button>
 </nav>
@@ -466,7 +508,27 @@
   </div>
 </div>
 
-<!-- Sheet: exportar -->
+<!-- Sheet: recetas -->
+<div class="overlay" id="recipesOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>Recetas</h2>
+      <button class="close" data-close="recipesOverlay">✕</button>
+    </div>
+    <span style="display:block;font-size:11.5px;color:var(--ink-soft);margin:-8px 0 14px;line-height:1.5;">
+      Del Recetario Fitness, adaptadas sin TACC. Los reemplazos no cambian las calorías de la tabla original.
+    </span>
+
+    <div style="font-size:12px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Armar mi día</div>
+    <div id="dayPlans" style="margin-bottom:20px;"></div>
+
+    <div style="font-size:12px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Recetas individuales</div>
+    <div class="chips" id="recipeCatChips">
+      <button type="button" class="chip sel" data-cat="Todas">Todas</button>
+    </div>
+    <div id="recipeList"></div>
+  </div>
+</div>
 <div class="overlay" id="exportOverlay">
   <div class="sheet">
     <div class="sheet-head">
@@ -613,6 +675,181 @@
   function normalize(s){
     return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   }
+
+  // Recetas del "Recetario Fitness — Músculo Lab", auditadas ingrediente por ingrediente
+  // para celiaquía. gf:true = apta tal cual. gf:false = necesita el reemplazo indicado en "note"
+  // (reemplazos según la propia tabla de sustituciones del libro, págs. 129-131).
+  const RECIPE_DB = [
+    // ---- DESAYUNOS ----
+    {n:"Panqueques Proteicos de Avena y Banana", cat:"Desayuno", k:420,p:35,c:48,f:10, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Tostadas de Huevo y Palta", cat:"Desayuno", k:450,p:22,c:35,f:24, gf:false, note:"Usar pan sin TACC"},
+    {n:"Overnight Oats de Chocolate", cat:"Desayuno", k:480,p:38,c:52,f:14, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Overnight Oats Tropical", cat:"Desayuno", k:460,p:32,c:55,f:13, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Overnight Oats de Frutos Rojos", cat:"Desayuno", k:430,p:28,c:54,f:11, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Bowl de Yogur Griego con Granola", cat:"Desayuno", k:410,p:30,c:50,f:12, gf:false, note:"Hacer la granola casera con avena certificada sin gluten"},
+    {n:"Omelette Cargado de Vegetales", cat:"Desayuno", k:350,p:28,c:5,f:24, gf:true},
+    {n:"Wrap de Huevo, Espinaca y Pavo", cat:"Desayuno", k:380,p:30,c:28,f:16, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
+    {n:"Avena Horneada con Proteína", cat:"Desayuno", k:380,p:28,c:50,f:8, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Muffins de Huevo para Meal Prep", cat:"Desayuno", k:290,p:26,c:3,f:19, gf:true},
+    {n:"Smoothie Bowl de Frutos Rojos", cat:"Desayuno", k:400,p:30,c:52,f:8, gf:true, note:"Verificar que el topping de granola sea sin TACC"},
+    {n:"Huevos Revueltos con Salmón", cat:"Desayuno", k:440,p:35,c:22,f:24, gf:false, note:"Servir con pan sin TACC (o sin pan)"},
+    {n:"Tostada Francesa Proteica", cat:"Desayuno", k:390,p:32,c:40,f:10, gf:false, note:"La base es pan de molde — usar pan sin TACC"},
+    {n:"Chia Pudding de Vainilla", cat:"Desayuno", k:340,p:30,c:28,f:12, gf:true},
+    {n:"Chia Pudding de Chocolate", cat:"Desayuno", k:380,p:34,c:26,f:16, gf:true},
+    {n:"Chia Pudding de Frutos Rojos", cat:"Desayuno", k:360,p:26,c:38,f:12, gf:true},
+    {n:"Panqueques de Banana sin Harina", cat:"Desayuno", k:250,p:14,c:28,f:10, gf:true},
+    {n:"Yogur Griego con Frutos Secos", cat:"Desayuno", k:320,p:24,c:25,f:14, gf:true},
+    {n:"Tortilla de Claras con Avena", cat:"Desayuno", k:230,p:24,c:22,f:3, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Açaí Bowl Express", cat:"Desayuno", k:430,p:28,c:56,f:10, gf:true, note:"Verificar que el topping de granola sea sin TACC"},
+    // ---- ALMUERZOS ----
+    {n:"Bowl de Pollo Teriyaki con Arroz y Brócoli", cat:"Almuerzo", k:480,p:42,c:55,f:8, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+    {n:"Wrap de Atún Mediterráneo", cat:"Almuerzo", k:420,p:35,c:30,f:18, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
+    {n:"Pasta de Pollo con Salsa de Tomate", cat:"Almuerzo", k:520,p:40,c:62,f:10, gf:false, note:"Usar pasta o fideos de arroz"},
+    {n:"Stir-Fry de Carne con Vegetales", cat:"Almuerzo", k:490,p:40,c:48,f:12, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+    {n:"Bowl Mexicano de Carne y Frijoles", cat:"Almuerzo", k:510,p:38,c:50,f:16, gf:true},
+    {n:"Ensalada César Proteica", cat:"Almuerzo", k:440,p:45,c:20,f:20, gf:false, note:"Usar croutons sin TACC u omitirlos"},
+    {n:"Hamburguesa Fit", cat:"Almuerzo", k:430,p:38,c:32,f:16, gf:false, note:"Usar avena certificada sin gluten en el patty y pan sin TACC"},
+    {n:"Arroz con Pollo al Curry", cat:"Almuerzo", k:470,p:38,c:48,f:14, gf:true},
+    {n:"Bowl de Salmón con Quinoa", cat:"Almuerzo", k:530,p:38,c:40,f:24, gf:false, note:"El aderezo lleva soja — usar tamari sin TACC"},
+    {n:"Tacos de Pavo con Guacamole", cat:"Almuerzo", k:460,p:36,c:38,f:18, gf:true, note:"Ya usa tortillas de maíz"},
+    {n:"Pasta con Albóndigas de Pavo", cat:"Almuerzo", k:500,p:40,c:58,f:12, gf:false, note:"Usar pasta de arroz y pan rallado sin TACC"},
+    {n:"Pollo al Limón con Papas", cat:"Almuerzo", k:460,p:42,c:45,f:10, gf:true},
+    {n:"Bowl de Garbanzos y Pollo", cat:"Almuerzo", k:470,p:42,c:38,f:16, gf:true},
+    {n:"Milanesa de Pollo al Horno", cat:"Almuerzo", k:420,p:44,c:28,f:14, gf:false, note:"Usar pan rallado sin TACC"},
+    {n:"Arroz Frito con Huevo", cat:"Almuerzo", k:420,p:20,c:52,f:14, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+    {n:"Ensalada de Lentejas con Atún", cat:"Almuerzo", k:430,p:40,c:42,f:10, gf:true},
+    {n:"Pollo con Batata y Espinaca", cat:"Almuerzo", k:440,p:40,c:42,f:12, gf:true},
+    {n:"Quesadilla de Pollo", cat:"Almuerzo", k:400,p:35,c:30,f:15, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
+    {n:"Buddha Bowl de Pollo", cat:"Almuerzo", k:510,p:38,c:42,f:22, gf:true},
+    {n:"Fideos con Brócoli y Pollo al Ajo", cat:"Almuerzo", k:460,p:38,c:50,f:12, gf:false, note:"Usar fideos de arroz"},
+    {n:"Tostón de Atún", cat:"Almuerzo", k:410,p:36,c:30,f:14, gf:false, note:"Usar pan sin TACC"},
+    {n:"Wok de Pollo y Sésamo", cat:"Almuerzo", k:400,p:38,c:25,f:16, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+    // ---- CENAS ----
+    {n:"Salmón al Horno con Vegetales", cat:"Cena", k:420,p:36,c:12,f:26, gf:true},
+    {n:"Sopa Cremosa de Pollo", cat:"Cena", k:350,p:32,c:28,f:12, gf:true},
+    {n:"Omelette de Espinaca y Champiñones", cat:"Cena", k:300,p:25,c:4,f:20, gf:true},
+    {n:"Ensalada Tibia de Garbanzos y Pollo", cat:"Cena", k:440,p:40,c:32,f:16, gf:true},
+    {n:"Merluza con Puré de Coliflor", cat:"Cena", k:320,p:35,c:10,f:16, gf:true},
+    {n:"Wok de Camarones", cat:"Cena", k:300,p:30,c:18,f:10, gf:true},
+    {n:"Pechuga Rellena de Espinaca y Queso", cat:"Cena", k:380,p:44,c:3,f:20, gf:true},
+    {n:"Sopa de Lentejas", cat:"Cena", k:380,p:28,c:48,f:6, gf:true},
+    {n:"Tacos de Lechuga con Carne", cat:"Cena", k:350,p:34,c:8,f:20, gf:true},
+    {n:"Bowl de Atún y Palta", cat:"Cena", k:380,p:32,c:12,f:24, gf:false, note:"El aderezo lleva soja — usar tamari sin TACC"},
+    {n:"Tortilla Española", cat:"Cena", k:350,p:20,c:30,f:16, gf:true},
+    {n:"Pollo al Verdeo", cat:"Cena", k:400,p:40,c:30,f:12, gf:true},
+    {n:"Revuelto de Pavo y Palta", cat:"Cena", k:380,p:32,c:5,f:26, gf:true},
+    {n:"Zucchinis Rellenos", cat:"Cena", k:380,p:35,c:12,f:22, gf:true},
+    {n:"Wrap de Lechuga Asiático", cat:"Cena", k:320,p:34,c:10,f:16, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+    {n:"Wok de Tofu", cat:"Cena", k:320,p:22,c:20,f:18, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+    {n:"Berenjenas Rellenas", cat:"Cena", k:360,p:36,c:18,f:16, gf:true},
+    {n:"Cazuela de Mariscos", cat:"Cena", k:320,p:34,c:15,f:12, gf:false, note:"Servir con pan sin TACC (o sin pan)"},
+    // ---- SNACKS ----
+    {n:"Barritas de Granola", cat:"Snack", k:180,p:12,c:20,f:6, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Tostadas de Arroz con Maní y Banana", cat:"Snack", k:220,p:8,c:28,f:10, gf:true, note:"Son tortitas de arroz, no pan"},
+    {n:"Huevos Duros", cat:"Snack", k:140,p:12,c:0,f:10, gf:true},
+    {n:"Mix de Frutos Secos", cat:"Snack", k:250,p:8,c:15,f:18, gf:true},
+    {n:"Bastones de Verdura con Hummus", cat:"Snack", k:180,p:6,c:20,f:8, gf:true},
+    {n:"Yogur con Proteína y Berries", cat:"Snack", k:260,p:35,c:22,f:4, gf:true},
+    {n:"Banana con Maní", cat:"Snack", k:280,p:8,c:35,f:14, gf:true},
+    {n:"Rollitos de Pavo", cat:"Snack", k:160,p:22,c:2,f:6, gf:true},
+    {n:"Edamames", cat:"Snack", k:190,p:17,c:8,f:9, gf:true},
+    {n:"Manzana con Almendras", cat:"Snack", k:230,p:5,c:30,f:12, gf:true},
+    {n:"Chips de Batata", cat:"Snack", k:160,p:2,c:30,f:4, gf:true},
+    {n:"Shake de Vainilla", cat:"Snack", k:250,p:30,c:18,f:5, gf:true},
+    {n:"Tostada de Ricotta, Tomate y Albahaca", cat:"Snack", k:200,p:12,c:18,f:8, gf:false, note:"Usar pan sin TACC"},
+    {n:"Pepino con Queso Crema y Salmón", cat:"Snack", k:170,p:14,c:4,f:10, gf:true},
+    {n:"Bolitas de Avena, Maní y Chocolate", cat:"Snack", k:90,p:4,c:10,f:4, gf:false, note:"Usar avena certificada sin gluten (90 kcal c/u)"},
+    {n:"Cottage con Frutas y Miel", cat:"Snack", k:200,p:20,c:22,f:3, gf:true},
+    {n:"Palitos de Queso Mozzarella", cat:"Snack", k:300,p:30,c:6,f:18, gf:true, note:"Porción de 6 palitos"},
+    // ---- POSTRES ----
+    {n:"Brownies Proteicos", cat:"Postre", k:120,p:10,c:14,f:4, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Mousse de Chocolate", cat:"Postre", k:200,p:24,c:12,f:6, gf:true},
+    {n:"Banana Ice Cream", cat:"Postre", k:180,p:18,c:28,f:2, gf:true},
+    {n:"Mug Cake de Vainilla", cat:"Postre", k:220,p:25,c:18,f:6, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Flan sin Azúcar", cat:"Postre", k:130,p:16,c:10,f:3, gf:true},
+    {n:"Galletas de Avena y Banana", cat:"Postre", k:80,p:3,c:12,f:3, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Cheesecake sin Horno", cat:"Postre", k:160,p:14,c:12,f:6, gf:false, note:"Usar galletitas sin TACC en la base"},
+    {n:"Paletas de Yogur y Fruta", cat:"Postre", k:80,p:6,c:12,f:1, gf:true},
+    {n:"Trufas de Chocolate y Proteína", cat:"Postre", k:210,p:15,c:18,f:9, gf:true, note:"Porción de 3 trufas"},
+    {n:"Pancakes de Chocolate Proteicos", cat:"Postre", k:350,p:32,c:38,f:8, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Tiramisú Fit sin Horno", cat:"Postre", k:180,p:14,c:16,f:6, gf:false, note:"Usar vainillas/bizcochos sin TACC"},
+    {n:"Budín de Banana Proteico", cat:"Postre", k:150,p:10,c:20,f:4, gf:false, note:"Usar avena certificada sin gluten"},
+    {n:"Alfajores Proteicos de Maicena", cat:"Postre", k:220,p:12,c:28,f:8, gf:false, note:"Usar avena certificada sin gluten (porción 2 alfajores)"},
+    {n:"Tarta de Frutillas y Crema Proteica", cat:"Postre", k:140,p:12,c:14,f:4, gf:false, note:"Usar galletitas sin TACC en la base"},
+    {n:"Helado de Proteína", cat:"Postre", k:140,p:18,c:18,f:3, gf:true},
+    // ---- OPCIONES VEGGIE ----
+    {n:"Buddha Bowl Vegano de Garbanzos", cat:"Veggie", k:480,p:22,c:52,f:20, gf:true},
+    {n:"Pasta Primavera con Vegetales", cat:"Veggie", k:420,p:14,c:62,f:12, gf:false, note:"Usar pasta de arroz"},
+    {n:"Curry de Lentejas Rojas", cat:"Veggie", k:380,p:20,c:52,f:8, gf:true},
+    {n:"Tacos de Coliflor Especiada", cat:"Veggie", k:340,p:12,c:38,f:16, gf:true, note:"Ya usa tortillas de maíz"},
+    {n:"Risotto de Hongos y Parmesano", cat:"Veggie", k:440,p:16,c:58,f:14, gf:true},
+    {n:"Ensalada de Quinoa Mediterránea", cat:"Veggie", k:380,p:14,c:42,f:18, gf:true},
+    {n:"Wok de Tofu Crocante con Vegetales", cat:"Veggie", k:340,p:24,c:22,f:18, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+    {n:"Hamburguesa de Porotos Negros", cat:"Veggie", k:280,p:14,c:36,f:8, gf:false, note:"Usar avena certificada sin gluten y pan sin TACC"},
+    {n:"Chili Vegano de Porotos", cat:"Veggie", k:360,p:18,c:50,f:8, gf:true},
+    {n:"Pad Thai Vegano", cat:"Veggie", k:420,p:16,c:52,f:16, gf:false, note:"Ya usa fideos de arroz — solo cambiar la salsa de soja por tamari"},
+    {n:"Pizza de Coliflor", cat:"Veggie", k:320,p:18,c:20,f:18, gf:true},
+    {n:"Wrap de Hummus con Vegetales Asados", cat:"Veggie", k:380,p:14,c:42,f:16, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
+    {n:"Sopa de Calabaza y Jengibre", cat:"Veggie", k:200,p:6,c:32,f:6, gf:true},
+    {n:"Ñoquis de Batata con Salsa de Salvia", cat:"Veggie", k:420,p:12,c:68,f:10, gf:false, note:"Usar harina de arroz o premezcla sin TACC"},
+    {n:"Bowl de Arroz con Edamames y Palta", cat:"Veggie", k:460,p:18,c:52,f:20, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
+  ];
+  const RECIPE_CATS = ["Desayuno","Almuerzo","Cena","Snack","Postre","Veggie"];
+
+  function findRecipe(name){ return RECIPE_DB.find(r=>r.n===name); }
+  function sumRecipes(names){
+    return names.reduce((acc,name)=>{
+      const r = findRecipe(name);
+      if(r){ acc.kcal+=r.k; acc.p+=r.p; acc.c+=r.c; acc.f+=r.f; }
+      return acc;
+    }, {kcal:0,p:0,c:0,f:0});
+  }
+
+  // Planes de un día completo, mezclando recetas ya aptas o adaptadas.
+  const DAY_PLANS = [
+    {
+      name:"Déficit", tag:"Bajar grasa", color:"var(--brick)",
+      items:[
+        {recipe:"Tostadas de Huevo y Palta", meal:"Desayuno", time:"08:00"},
+        {recipe:"Bowl de Garbanzos y Pollo", meal:"Almuerzo", time:"13:00"},
+        {recipe:"Yogur con Proteína y Berries", meal:"Snack", time:"17:00"},
+        {recipe:"Pollo al Verdeo", meal:"Cena", time:"20:30"},
+        {recipe:"Mousse de Chocolate", meal:"Snack", time:"21:30"},
+      ]
+    },
+    {
+      name:"Mantenimiento", tag:"Peso estable", color:"var(--green)",
+      items:[
+        {recipe:"Bowl de Yogur Griego con Granola", meal:"Desayuno", time:"08:00"},
+        {recipe:"Bowl de Pollo Teriyaki con Arroz y Brócoli", meal:"Almuerzo", time:"13:00"},
+        {recipe:"Mix de Frutos Secos", meal:"Snack", time:"17:00"},
+        {recipe:"Pechuga Rellena de Espinaca y Queso", meal:"Cena", time:"20:30"},
+        {recipe:"Tiramisú Fit sin Horno", meal:"Snack", time:"21:30"},
+      ]
+    },
+    {
+      name:"Superávit", tag:"Ganar músculo", color:"var(--amber)",
+      items:[
+        {recipe:"Overnight Oats de Chocolate", meal:"Desayuno", time:"08:00"},
+        {recipe:"Bowl de Salmón con Quinoa", meal:"Almuerzo", time:"13:00"},
+        {recipe:"Shake de Vainilla", meal:"Snack", time:"16:30"},
+        {recipe:"Rollitos de Pavo", meal:"Snack", time:"18:00"},
+        {recipe:"Ensalada Tibia de Garbanzos y Pollo", meal:"Cena", time:"20:30"},
+        {recipe:"Trufas de Chocolate y Proteína", meal:"Snack", time:"21:30"},
+      ]
+    },
+    {
+      name:"Veggie", tag:"100% sin carne", color:"var(--green)",
+      items:[
+        {recipe:"Chia Pudding de Chocolate", meal:"Desayuno", time:"08:00"},
+        {recipe:"Buddha Bowl Vegano de Garbanzos", meal:"Almuerzo", time:"13:00"},
+        {recipe:"Tostadas de Arroz con Maní y Banana", meal:"Snack", time:"17:00"},
+        {recipe:"Mix de Frutos Secos", meal:"Snack", time:"18:30"},
+        {recipe:"Chili Vegano de Porotos", meal:"Cena", time:"20:30"},
+        {recipe:"Helado de Proteína", meal:"Snack", time:"21:30"},
+      ]
+    },
+  ];
 
   const $ = (sel, root) => (root||document).querySelector(sel);
   const $all = (sel, root) => Array.from((root||document).querySelectorAll(sel));
@@ -1054,10 +1291,11 @@
       const tab = btn.dataset.tab;
       if(tab === "history"){ renderHistory(); openSheet("historyOverlay"); }
       else if(tab === "export"){ openSheet("exportOverlay"); }
+      else if(tab === "recipes"){ renderDayPlans(); renderRecipeList(); openSheet("recipesOverlay"); }
     });
   });
   // reset nav to "Hoy" whenever a modal that isn't a tab target closes
-  ["historyOverlay","exportOverlay"].forEach(id=>{
+  ["historyOverlay","exportOverlay","recipesOverlay"].forEach(id=>{
     $("#"+id).addEventListener("click",(e)=>{
       if(e.target.closest("[data-close]") || e.target.id===id){
         $all("nav.bottom button").forEach(b=> b.classList.toggle("active", b.dataset.tab==="today"));
@@ -1090,6 +1328,107 @@
         closeSheet("historyOverlay");
         $all("nav.bottom button").forEach(b=> b.classList.toggle("active", b.dataset.tab==="today"));
         render();
+      });
+      root.appendChild(row);
+    });
+  }
+
+  /* ---------- recetas ---------- */
+  let recipeCatFilter = "Todas";
+
+  function gfBadge(r){
+    if(r.gf) return `<span class="gf-badge gf-ok">Sin TACC</span>`;
+    return `<span class="gf-badge gf-swap">Adaptar</span>`;
+  }
+
+  function addRecipeToLog(r, opts){
+    opts = opts || {};
+    const meal = opts.meal || (r.cat==="Postre" ? "Snack" : (r.cat==="Veggie" ? "Almuerzo" : r.cat));
+    const time = opts.time || nowTime();
+    const notes = r.gf ? "" : ("Adaptar sin TACC: " + r.note);
+    data[currentDate] = data[currentDate] || [];
+    data[currentDate].push({
+      id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+      name: r.n, kcal: r.k,
+      time, meal,
+      protein: r.p, carbs: r.c, fat: r.f,
+      notes,
+      loggedAt: new Date().toISOString()
+    });
+  }
+
+  function renderDayPlans(){
+    const root = $("#dayPlans");
+    root.innerHTML = "";
+    DAY_PLANS.forEach(plan=>{
+      const totals = sumRecipes(plan.items.map(i=>i.recipe));
+      const allGf = plan.items.every(i=>{ const r=findRecipe(i.recipe); return r && r.gf; });
+      const card = document.createElement("div");
+      card.className = "plan-card";
+      card.style.setProperty("--plan-color", plan.color);
+      card.innerHTML = `
+        <div class="plan-top">
+          <div>
+            <div class="plan-name">${plan.name}</div>
+            <div class="plan-tag">${plan.tag}${allGf ? " · 100% sin TACC" : ""}</div>
+          </div>
+          <div class="plan-kcal tabular">${Math.round(totals.kcal)}<span>kcal</span></div>
+        </div>
+        <div class="plan-items">${plan.items.map(i=>{
+          const r = findRecipe(i.recipe);
+          return `<div class="plan-item"><span class="pi-meal">${i.meal}</span><span class="pi-name">${r?r.n:i.recipe}</span>${(r&&!r.gf)?'<span class="gf-dot"></span>':''}</div>`;
+        }).join("")}</div>
+        <div class="plan-macros">P ${Math.round(totals.p)}g · C ${Math.round(totals.c)}g · G ${Math.round(totals.f)}g</div>
+        <button type="button" class="primary-btn plan-use" style="margin-top:10px;">Usar este día</button>
+      `;
+      card.querySelector(".plan-use").addEventListener("click", ()=>{
+        plan.items.forEach(i=>{
+          const r = findRecipe(i.recipe);
+          if(r) addRecipeToLog(r, {meal:i.meal, time:i.time});
+        });
+        saveData(data);
+        render();
+        closeSheet("recipesOverlay");
+        $all("nav.bottom button").forEach(b=> b.classList.toggle("active", b.dataset.tab==="today"));
+        showToast("Día cargado: " + plan.name + " ✓");
+      });
+      root.appendChild(card);
+    });
+  }
+
+  function renderRecipeCatChips(){
+    const box = $("#recipeCatChips");
+    box.innerHTML = `<button type="button" class="chip ${recipeCatFilter==="Todas"?"sel":""}" data-cat="Todas">Todas</button>` +
+      RECIPE_CATS.map(c=> `<button type="button" class="chip ${recipeCatFilter===c?"sel":""}" data-cat="${c}">${c}</button>`).join("");
+    $all(".chip", box).forEach(chip=>{
+      chip.addEventListener("click", ()=>{
+        recipeCatFilter = chip.dataset.cat;
+        renderRecipeCatChips();
+        renderRecipeList();
+      });
+    });
+  }
+
+  function renderRecipeList(){
+    const root = $("#recipeList");
+    const list = RECIPE_DB.filter(r=> recipeCatFilter==="Todas" || r.cat===recipeCatFilter);
+    root.innerHTML = "";
+    list.forEach(r=>{
+      const row = document.createElement("div");
+      row.className = "recipe-row";
+      row.innerHTML = `
+        <div class="rr-main">
+          <div class="rr-name">${r.n} ${gfBadge(r)}</div>
+          <div class="rr-macros">${r.k} kcal · P ${r.p}g · C ${r.c}g · G ${r.f}g</div>
+          ${r.note ? `<div class="rr-note">${r.note}</div>` : ""}
+        </div>
+        <button type="button" class="rr-add" aria-label="Agregar">+</button>
+      `;
+      row.querySelector(".rr-add").addEventListener("click", ()=>{
+        addRecipeToLog(r);
+        saveData(data);
+        render();
+        showToast(r.n + " agregado ✓");
       });
       root.appendChild(row);
     });
