@@ -68,6 +68,8 @@
     border:1px solid var(--line);
     border-radius:var(--radius);
     padding:16px;
+  }
+  .summary-top{
     display:flex;
     align-items:center;
     gap:16px;
@@ -276,46 +278,63 @@
   .hist-day .r{font-size:15px;font-weight:800;color:var(--green);text-align:right;}
   .hist-day .r span{display:block;font-size:10.5px;font-weight:600;color:var(--ink-soft);}
 
-  /* planes de día */
-  .plan-card{
-    background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--plan-color,var(--green));
-    border-radius:13px;padding:14px;margin-bottom:12px;
+  /* balance / ejercicio en el resumen */
+  .balance-row{
+    display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);
   }
-  .plan-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-  .plan-name{font-size:15px;font-weight:800;color:var(--ink);}
-  .plan-tag{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .plan-kcal{font-size:18px;font-weight:800;color:var(--plan-color,var(--green));text-align:right;line-height:1.1;}
-  .plan-kcal span{display:block;font-size:10px;font-weight:600;color:var(--ink-soft);}
-  .plan-items{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;}
-  .plan-item{display:flex;align-items:center;gap:7px;font-size:12.5px;}
-  .plan-item .pi-meal{
-    flex:none;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;
-    color:var(--ink-soft);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px;
-    width:64px;text-align:center;
-  }
-  .plan-item .pi-name{flex:1;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .plan-item .gf-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--amber);}
-  .plan-macros{font-size:12px;color:var(--ink-soft);font-weight:600;}
+  .balance-item{flex:1;text-align:center;}
+  .balance-item .bi-n{font-size:16px;font-weight:800;}
+  .balance-item .bi-n.neg{color:var(--brick);}
+  .balance-item .bi-n.pos{color:var(--green);}
+  .balance-item .bi-l{font-size:10px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-top:2px;}
+  .balance-div{width:1px;height:28px;background:var(--line);flex:none;}
 
-  /* lista de recetas */
-  .recipe-row{
-    display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
-    border-radius:12px;padding:11px 12px;margin-bottom:8px;
+  .add-exercise-btn{
+    display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+    background:var(--surface);border:1px dashed var(--line);color:var(--ink-soft);
+    border-radius:12px;padding:10px;font-size:13px;font-weight:700;margin:2px 0 16px;
   }
-  .rr-main{flex:1;min-width:0;}
-  .rr-name{font-size:13.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-  .rr-macros{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .rr-note{font-size:11px;color:var(--amber);margin-top:2px;}
-  .rr-add{
-    flex:none;width:32px;height:32px;border-radius:10px;border:none;background:var(--green);
-    color:#fff;font-size:18px;line-height:0;
+  .exercise-entry{
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;
+    display:flex;align-items:center;gap:11px;margin-bottom:8px;
   }
-  .gf-badge{
+  .exercise-entry .time{font-size:12px;font-weight:700;color:var(--ink-faint);width:40px;flex:none;}
+  .exercise-entry .info{flex:1;min-width:0;}
+  .exercise-entry .info .name{font-size:14px;font-weight:600;color:var(--ink);}
+  .exercise-entry .info .sub{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+  .exercise-entry .kcal{font-size:15px;font-weight:800;color:var(--brick);flex:none;}
+  .exercise-entry .del{flex:none;width:26px;height:26px;border-radius:8px;border:none;background:transparent;color:var(--ink-faint);font-size:15px;}
+  .exercise-entry .del:active{background:var(--brick-soft);color:var(--brick);}
+
+  /* lista de alimentos: badge "mío" */
+  .mine-badge{
     font-size:9.5px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;
-    padding:2px 7px;border-radius:999px;
+    padding:2px 7px;border-radius:999px;background:var(--amber-soft);color:var(--amber);
   }
-  .gf-badge.gf-ok{background:var(--green-soft);color:var(--green);}
-  .gf-badge.gf-swap{background:#F3E2C7;color:var(--amber);}
+
+  /* informe / gráfico */
+  .report-range{display:flex;gap:7px;margin-bottom:16px;}
+  .report-range button{
+    flex:1;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);
+    font-size:12.5px;font-weight:700;padding:9px;border-radius:11px;
+  }
+  .report-range button.sel{background:var(--green);border-color:var(--green);color:#fff;}
+  .report-summary{
+    background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:16px;
+    display:flex;justify-content:space-around;text-align:center;
+  }
+  .report-summary .rs-n{font-size:17px;font-weight:800;color:var(--ink);}
+  .report-summary .rs-l{font-size:10.5px;color:var(--ink-soft);font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:.02em;}
+  .chart-wrap{
+    background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px 12px 8px;margin-bottom:16px;
+  }
+  .chart-title{font-size:12px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.02em;margin-bottom:14px;}
+  .bar-chart{display:flex;align-items:flex-end;gap:5px;height:160px;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .bar-col .bar-val{font-size:9px;font-weight:700;color:var(--ink-soft);margin-bottom:3px;white-space:nowrap;}
+  .bar-col .bar{width:100%;max-width:22px;background:var(--green);border-radius:5px 5px 2px 2px;min-height:2px;}
+  .bar-col .bar-label{font-size:8.5px;color:var(--ink-faint);margin-top:6px;text-align:center;line-height:1.2;}
+  .report-empty{text-align:center;padding:30px 20px;color:var(--ink-soft);font-size:13.5px;}
 
   ::selection{background:var(--green-soft);}
 </style>
@@ -337,42 +356,46 @@
 </header>
 
 <div class="summary">
-  <div class="ring-wrap">
-    <svg viewBox="0 0 96 96">
-      <circle class="ring-bg" cx="48" cy="48" r="40"></circle>
-      <circle class="ring-fg" id="ringFg" cx="48" cy="48" r="40" stroke-dasharray="0 251"></circle>
-    </svg>
-    <div class="ring-center">
-      <div class="n tabular" id="totalKcal">0</div>
-      <div class="u">kcal</div>
-    </div>
-  </div>
-  <div class="summary-meta">
-    <div class="kcal-target" id="targetLine">Sin objetivo diario · <button id="setTargetBtn">definir</button></div>
-    <div class="macros">
-      <div class="macro p">
-        <div class="bar"><i id="barP" style="width:0%"></i></div>
-        <div class="label"><span>Prot.</span><b id="mP" class="tabular">0g</b></div>
-      </div>
-      <div class="macro c">
-        <div class="bar"><i id="barC" style="width:0%"></i></div>
-        <div class="label"><span>Carb.</span><b id="mC" class="tabular">0g</b></div>
-      </div>
-      <div class="macro f">
-        <div class="bar"><i id="barF" style="width:0%"></i></div>
-        <div class="label"><span>Grasa</span><b id="mF" class="tabular">0g</b></div>
+  <div class="summary-top">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 96 96">
+        <circle class="ring-bg" cx="48" cy="48" r="40"></circle>
+        <circle class="ring-fg" id="ringFg" cx="48" cy="48" r="40" stroke-dasharray="0 251"></circle>
+      </svg>
+      <div class="ring-center">
+        <div class="n tabular" id="totalKcal">0</div>
+        <div class="u">kcal</div>
       </div>
     </div>
+    <div class="summary-meta">
+      <div class="kcal-target" id="targetLine">Sin objetivo diario · <button id="setTargetBtn">definir</button></div>
+      <div class="macros">
+        <div class="macro p">
+          <div class="bar"><i id="barP" style="width:0%"></i></div>
+          <div class="label"><span>Prot.</span><b id="mP" class="tabular">0g</b></div>
+        </div>
+        <div class="macro c">
+          <div class="bar"><i id="barC" style="width:0%"></i></div>
+          <div class="label"><span>Carb.</span><b id="mC" class="tabular">0g</b></div>
+        </div>
+        <div class="macro f">
+          <div class="bar"><i id="barF" style="width:0%"></i></div>
+          <div class="label"><span>Grasa</span><b id="mF" class="tabular">0g</b></div>
+        </div>
+      </div>
+    </div>
   </div>
+  <div class="balance-row" id="balanceRow"></div>
 </div>
 
 <main id="mealList"></main>
+<div id="exerciseSection" style="padding:0 18px;"></div>
 
 <button class="fab" id="fabAdd" aria-label="Agregar alimento">+</button>
 
 <nav class="bottom">
   <button class="active" data-tab="today"><span class="ic">📋</span>Hoy</button>
-  <button data-tab="recipes"><span class="ic">📖</span>Recetas</button>
+  <button data-tab="report"><span class="ic">📊</span>Informe</button>
   <button data-tab="history"><span class="ic">🗓️</span>Historial</button>
   <button data-tab="export"><span class="ic">⇪</span>Exportar</button>
 </nav>
@@ -427,8 +450,8 @@
           <input type="number" id="fKcal" inputmode="decimal" placeholder="0">
         </label>
         <label class="field">
-          <span>&nbsp;</span>
-          <input type="hidden">
+          <span>Gramos de esta porción (opcional)</span>
+          <input type="number" id="fManualGrams" inputmode="decimal" placeholder="Ej: 350">
         </label>
       </div>
       <div class="row3">
@@ -445,6 +468,10 @@
           <input type="number" id="fFat" inputmode="decimal" placeholder="0">
         </label>
       </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);margin:2px 0 12px;">
+        <input type="checkbox" id="fRemember" checked style="width:16px;height:16px;">
+        Recordar este alimento para la próxima vez
+      </label>
       <button type="button" class="ghost-btn" id="addToPlateManual">+ Sumar al plato y cargar otro</button>
     </div>
 
@@ -508,25 +535,84 @@
   </div>
 </div>
 
-<!-- Sheet: recetas -->
-<div class="overlay" id="recipesOverlay">
+<!-- Sheet: agregar ejercicio -->
+<div class="overlay" id="addExerciseOverlay">
   <div class="sheet">
     <div class="sheet-head">
-      <h2>Recetas</h2>
-      <button class="close" data-close="recipesOverlay">✕</button>
+      <h2>Nuevo ejercicio</h2>
+      <button class="close" data-close="addExerciseOverlay">✕</button>
     </div>
-    <span style="display:block;font-size:11.5px;color:var(--ink-soft);margin:-8px 0 14px;line-height:1.5;">
-      Del Recetario Fitness, adaptadas sin TACC. Los reemplazos no cambian las calorías de la tabla original.
-    </span>
 
-    <div style="font-size:12px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Armar mi día</div>
-    <div id="dayPlans" style="margin-bottom:20px;"></div>
-
-    <div style="font-size:12px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Recetas individuales</div>
-    <div class="chips" id="recipeCatChips">
-      <button type="button" class="chip sel" data-cat="Todas">Todas</button>
+    <div class="chips" id="exModeChips" style="margin-bottom:14px;">
+      <button type="button" class="chip sel" data-mode="common">🏃 Actividades comunes</button>
+      <button type="button" class="chip" data-mode="manual">✏️ Carga manual</button>
     </div>
-    <div id="recipeList"></div>
+
+    <div id="exCommonMode">
+      <span style="display:block;font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:7px;">Actividad</span>
+      <div class="chips" id="exActivityChips"></div>
+
+      <div id="exSelectedBox" class="selected-food" style="display:none;">
+        <div class="sf-top">
+          <span id="exSelName" class="sf-name"></span>
+          <span style="font-size:11px;color:var(--ink-soft);">~<span id="exPer30"></span> kcal/30min</span>
+        </div>
+        <div class="qty-row">
+          <label class="field" style="flex:1;margin-bottom:0;">
+            <span>Duración (minutos)</span>
+            <input type="number" id="exMinutes" inputmode="decimal" value="30">
+          </label>
+        </div>
+        <div class="chips" id="exQuickMin">
+          <button type="button" class="chip qty" data-m="15">15 min</button>
+          <button type="button" class="chip qty" data-m="30">30 min</button>
+          <button type="button" class="chip qty" data-m="45">45 min</button>
+          <button type="button" class="chip qty" data-m="60">60 min</button>
+        </div>
+        <div class="sf-preview" id="exPreview">≈ 0 kcal</div>
+      </div>
+    </div>
+
+    <div id="exManualMode" style="display:none;">
+      <label class="field">
+        <span>Actividad</span>
+        <input type="text" id="exNameManual" placeholder="Ej: pádel, tacto rectal, fútbol...">
+      </label>
+      <div class="row2">
+        <label class="field">
+          <span>Calorías quemadas</span>
+          <input type="number" id="exKcalManual" inputmode="decimal" placeholder="0">
+        </label>
+        <label class="field">
+          <span>Duración (min)</span>
+          <input type="number" id="exMinutesManual" inputmode="decimal" placeholder="30">
+        </label>
+      </div>
+    </div>
+
+    <label class="field">
+      <span>Hora</span>
+      <input type="time" id="exTime">
+    </label>
+
+    <button class="primary-btn" id="saveExercise">Guardar ejercicio</button>
+  </div>
+</div>
+
+<!-- Sheet: informe -->
+<div class="overlay" id="reportOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>Informe</h2>
+      <button class="close" data-close="reportOverlay">✕</button>
+    </div>
+    <div class="report-range" id="reportRange">
+      <button type="button" class="sel" data-range="day">Día</button>
+      <button type="button" data-range="week">Semana</button>
+      <button type="button" data-range="month">Mes</button>
+      <button type="button" data-range="all">Todo</button>
+    </div>
+    <div id="reportBody"></div>
   </div>
 </div>
 <div class="overlay" id="exportOverlay">
@@ -676,179 +762,50 @@
     return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   }
 
-  // Recetas del "Recetario Fitness — Músculo Lab", auditadas ingrediente por ingrediente
-  // para celiaquía. gf:true = apta tal cual. gf:false = necesita el reemplazo indicado en "note"
-  // (reemplazos según la propia tabla de sustituciones del libro, págs. 129-131).
-  const RECIPE_DB = [
-    // ---- DESAYUNOS ----
-    {n:"Panqueques Proteicos de Avena y Banana", cat:"Desayuno", k:420,p:35,c:48,f:10, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Tostadas de Huevo y Palta", cat:"Desayuno", k:450,p:22,c:35,f:24, gf:false, note:"Usar pan sin TACC"},
-    {n:"Overnight Oats de Chocolate", cat:"Desayuno", k:480,p:38,c:52,f:14, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Overnight Oats Tropical", cat:"Desayuno", k:460,p:32,c:55,f:13, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Overnight Oats de Frutos Rojos", cat:"Desayuno", k:430,p:28,c:54,f:11, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Bowl de Yogur Griego con Granola", cat:"Desayuno", k:410,p:30,c:50,f:12, gf:false, note:"Hacer la granola casera con avena certificada sin gluten"},
-    {n:"Omelette Cargado de Vegetales", cat:"Desayuno", k:350,p:28,c:5,f:24, gf:true},
-    {n:"Wrap de Huevo, Espinaca y Pavo", cat:"Desayuno", k:380,p:30,c:28,f:16, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
-    {n:"Avena Horneada con Proteína", cat:"Desayuno", k:380,p:28,c:50,f:8, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Muffins de Huevo para Meal Prep", cat:"Desayuno", k:290,p:26,c:3,f:19, gf:true},
-    {n:"Smoothie Bowl de Frutos Rojos", cat:"Desayuno", k:400,p:30,c:52,f:8, gf:true, note:"Verificar que el topping de granola sea sin TACC"},
-    {n:"Huevos Revueltos con Salmón", cat:"Desayuno", k:440,p:35,c:22,f:24, gf:false, note:"Servir con pan sin TACC (o sin pan)"},
-    {n:"Tostada Francesa Proteica", cat:"Desayuno", k:390,p:32,c:40,f:10, gf:false, note:"La base es pan de molde — usar pan sin TACC"},
-    {n:"Chia Pudding de Vainilla", cat:"Desayuno", k:340,p:30,c:28,f:12, gf:true},
-    {n:"Chia Pudding de Chocolate", cat:"Desayuno", k:380,p:34,c:26,f:16, gf:true},
-    {n:"Chia Pudding de Frutos Rojos", cat:"Desayuno", k:360,p:26,c:38,f:12, gf:true},
-    {n:"Panqueques de Banana sin Harina", cat:"Desayuno", k:250,p:14,c:28,f:10, gf:true},
-    {n:"Yogur Griego con Frutos Secos", cat:"Desayuno", k:320,p:24,c:25,f:14, gf:true},
-    {n:"Tortilla de Claras con Avena", cat:"Desayuno", k:230,p:24,c:22,f:3, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Açaí Bowl Express", cat:"Desayuno", k:430,p:28,c:56,f:10, gf:true, note:"Verificar que el topping de granola sea sin TACC"},
-    // ---- ALMUERZOS ----
-    {n:"Bowl de Pollo Teriyaki con Arroz y Brócoli", cat:"Almuerzo", k:480,p:42,c:55,f:8, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-    {n:"Wrap de Atún Mediterráneo", cat:"Almuerzo", k:420,p:35,c:30,f:18, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
-    {n:"Pasta de Pollo con Salsa de Tomate", cat:"Almuerzo", k:520,p:40,c:62,f:10, gf:false, note:"Usar pasta o fideos de arroz"},
-    {n:"Stir-Fry de Carne con Vegetales", cat:"Almuerzo", k:490,p:40,c:48,f:12, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-    {n:"Bowl Mexicano de Carne y Frijoles", cat:"Almuerzo", k:510,p:38,c:50,f:16, gf:true},
-    {n:"Ensalada César Proteica", cat:"Almuerzo", k:440,p:45,c:20,f:20, gf:false, note:"Usar croutons sin TACC u omitirlos"},
-    {n:"Hamburguesa Fit", cat:"Almuerzo", k:430,p:38,c:32,f:16, gf:false, note:"Usar avena certificada sin gluten en el patty y pan sin TACC"},
-    {n:"Arroz con Pollo al Curry", cat:"Almuerzo", k:470,p:38,c:48,f:14, gf:true},
-    {n:"Bowl de Salmón con Quinoa", cat:"Almuerzo", k:530,p:38,c:40,f:24, gf:false, note:"El aderezo lleva soja — usar tamari sin TACC"},
-    {n:"Tacos de Pavo con Guacamole", cat:"Almuerzo", k:460,p:36,c:38,f:18, gf:true, note:"Ya usa tortillas de maíz"},
-    {n:"Pasta con Albóndigas de Pavo", cat:"Almuerzo", k:500,p:40,c:58,f:12, gf:false, note:"Usar pasta de arroz y pan rallado sin TACC"},
-    {n:"Pollo al Limón con Papas", cat:"Almuerzo", k:460,p:42,c:45,f:10, gf:true},
-    {n:"Bowl de Garbanzos y Pollo", cat:"Almuerzo", k:470,p:42,c:38,f:16, gf:true},
-    {n:"Milanesa de Pollo al Horno", cat:"Almuerzo", k:420,p:44,c:28,f:14, gf:false, note:"Usar pan rallado sin TACC"},
-    {n:"Arroz Frito con Huevo", cat:"Almuerzo", k:420,p:20,c:52,f:14, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-    {n:"Ensalada de Lentejas con Atún", cat:"Almuerzo", k:430,p:40,c:42,f:10, gf:true},
-    {n:"Pollo con Batata y Espinaca", cat:"Almuerzo", k:440,p:40,c:42,f:12, gf:true},
-    {n:"Quesadilla de Pollo", cat:"Almuerzo", k:400,p:35,c:30,f:15, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
-    {n:"Buddha Bowl de Pollo", cat:"Almuerzo", k:510,p:38,c:42,f:22, gf:true},
-    {n:"Fideos con Brócoli y Pollo al Ajo", cat:"Almuerzo", k:460,p:38,c:50,f:12, gf:false, note:"Usar fideos de arroz"},
-    {n:"Tostón de Atún", cat:"Almuerzo", k:410,p:36,c:30,f:14, gf:false, note:"Usar pan sin TACC"},
-    {n:"Wok de Pollo y Sésamo", cat:"Almuerzo", k:400,p:38,c:25,f:16, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-    // ---- CENAS ----
-    {n:"Salmón al Horno con Vegetales", cat:"Cena", k:420,p:36,c:12,f:26, gf:true},
-    {n:"Sopa Cremosa de Pollo", cat:"Cena", k:350,p:32,c:28,f:12, gf:true},
-    {n:"Omelette de Espinaca y Champiñones", cat:"Cena", k:300,p:25,c:4,f:20, gf:true},
-    {n:"Ensalada Tibia de Garbanzos y Pollo", cat:"Cena", k:440,p:40,c:32,f:16, gf:true},
-    {n:"Merluza con Puré de Coliflor", cat:"Cena", k:320,p:35,c:10,f:16, gf:true},
-    {n:"Wok de Camarones", cat:"Cena", k:300,p:30,c:18,f:10, gf:true},
-    {n:"Pechuga Rellena de Espinaca y Queso", cat:"Cena", k:380,p:44,c:3,f:20, gf:true},
-    {n:"Sopa de Lentejas", cat:"Cena", k:380,p:28,c:48,f:6, gf:true},
-    {n:"Tacos de Lechuga con Carne", cat:"Cena", k:350,p:34,c:8,f:20, gf:true},
-    {n:"Bowl de Atún y Palta", cat:"Cena", k:380,p:32,c:12,f:24, gf:false, note:"El aderezo lleva soja — usar tamari sin TACC"},
-    {n:"Tortilla Española", cat:"Cena", k:350,p:20,c:30,f:16, gf:true},
-    {n:"Pollo al Verdeo", cat:"Cena", k:400,p:40,c:30,f:12, gf:true},
-    {n:"Revuelto de Pavo y Palta", cat:"Cena", k:380,p:32,c:5,f:26, gf:true},
-    {n:"Zucchinis Rellenos", cat:"Cena", k:380,p:35,c:12,f:22, gf:true},
-    {n:"Wrap de Lechuga Asiático", cat:"Cena", k:320,p:34,c:10,f:16, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-    {n:"Wok de Tofu", cat:"Cena", k:320,p:22,c:20,f:18, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-    {n:"Berenjenas Rellenas", cat:"Cena", k:360,p:36,c:18,f:16, gf:true},
-    {n:"Cazuela de Mariscos", cat:"Cena", k:320,p:34,c:15,f:12, gf:false, note:"Servir con pan sin TACC (o sin pan)"},
-    // ---- SNACKS ----
-    {n:"Barritas de Granola", cat:"Snack", k:180,p:12,c:20,f:6, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Tostadas de Arroz con Maní y Banana", cat:"Snack", k:220,p:8,c:28,f:10, gf:true, note:"Son tortitas de arroz, no pan"},
-    {n:"Huevos Duros", cat:"Snack", k:140,p:12,c:0,f:10, gf:true},
-    {n:"Mix de Frutos Secos", cat:"Snack", k:250,p:8,c:15,f:18, gf:true},
-    {n:"Bastones de Verdura con Hummus", cat:"Snack", k:180,p:6,c:20,f:8, gf:true},
-    {n:"Yogur con Proteína y Berries", cat:"Snack", k:260,p:35,c:22,f:4, gf:true},
-    {n:"Banana con Maní", cat:"Snack", k:280,p:8,c:35,f:14, gf:true},
-    {n:"Rollitos de Pavo", cat:"Snack", k:160,p:22,c:2,f:6, gf:true},
-    {n:"Edamames", cat:"Snack", k:190,p:17,c:8,f:9, gf:true},
-    {n:"Manzana con Almendras", cat:"Snack", k:230,p:5,c:30,f:12, gf:true},
-    {n:"Chips de Batata", cat:"Snack", k:160,p:2,c:30,f:4, gf:true},
-    {n:"Shake de Vainilla", cat:"Snack", k:250,p:30,c:18,f:5, gf:true},
-    {n:"Tostada de Ricotta, Tomate y Albahaca", cat:"Snack", k:200,p:12,c:18,f:8, gf:false, note:"Usar pan sin TACC"},
-    {n:"Pepino con Queso Crema y Salmón", cat:"Snack", k:170,p:14,c:4,f:10, gf:true},
-    {n:"Bolitas de Avena, Maní y Chocolate", cat:"Snack", k:90,p:4,c:10,f:4, gf:false, note:"Usar avena certificada sin gluten (90 kcal c/u)"},
-    {n:"Cottage con Frutas y Miel", cat:"Snack", k:200,p:20,c:22,f:3, gf:true},
-    {n:"Palitos de Queso Mozzarella", cat:"Snack", k:300,p:30,c:6,f:18, gf:true, note:"Porción de 6 palitos"},
-    // ---- POSTRES ----
-    {n:"Brownies Proteicos", cat:"Postre", k:120,p:10,c:14,f:4, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Mousse de Chocolate", cat:"Postre", k:200,p:24,c:12,f:6, gf:true},
-    {n:"Banana Ice Cream", cat:"Postre", k:180,p:18,c:28,f:2, gf:true},
-    {n:"Mug Cake de Vainilla", cat:"Postre", k:220,p:25,c:18,f:6, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Flan sin Azúcar", cat:"Postre", k:130,p:16,c:10,f:3, gf:true},
-    {n:"Galletas de Avena y Banana", cat:"Postre", k:80,p:3,c:12,f:3, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Cheesecake sin Horno", cat:"Postre", k:160,p:14,c:12,f:6, gf:false, note:"Usar galletitas sin TACC en la base"},
-    {n:"Paletas de Yogur y Fruta", cat:"Postre", k:80,p:6,c:12,f:1, gf:true},
-    {n:"Trufas de Chocolate y Proteína", cat:"Postre", k:210,p:15,c:18,f:9, gf:true, note:"Porción de 3 trufas"},
-    {n:"Pancakes de Chocolate Proteicos", cat:"Postre", k:350,p:32,c:38,f:8, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Tiramisú Fit sin Horno", cat:"Postre", k:180,p:14,c:16,f:6, gf:false, note:"Usar vainillas/bizcochos sin TACC"},
-    {n:"Budín de Banana Proteico", cat:"Postre", k:150,p:10,c:20,f:4, gf:false, note:"Usar avena certificada sin gluten"},
-    {n:"Alfajores Proteicos de Maicena", cat:"Postre", k:220,p:12,c:28,f:8, gf:false, note:"Usar avena certificada sin gluten (porción 2 alfajores)"},
-    {n:"Tarta de Frutillas y Crema Proteica", cat:"Postre", k:140,p:12,c:14,f:4, gf:false, note:"Usar galletitas sin TACC en la base"},
-    {n:"Helado de Proteína", cat:"Postre", k:140,p:18,c:18,f:3, gf:true},
-    // ---- OPCIONES VEGGIE ----
-    {n:"Buddha Bowl Vegano de Garbanzos", cat:"Veggie", k:480,p:22,c:52,f:20, gf:true},
-    {n:"Pasta Primavera con Vegetales", cat:"Veggie", k:420,p:14,c:62,f:12, gf:false, note:"Usar pasta de arroz"},
-    {n:"Curry de Lentejas Rojas", cat:"Veggie", k:380,p:20,c:52,f:8, gf:true},
-    {n:"Tacos de Coliflor Especiada", cat:"Veggie", k:340,p:12,c:38,f:16, gf:true, note:"Ya usa tortillas de maíz"},
-    {n:"Risotto de Hongos y Parmesano", cat:"Veggie", k:440,p:16,c:58,f:14, gf:true},
-    {n:"Ensalada de Quinoa Mediterránea", cat:"Veggie", k:380,p:14,c:42,f:18, gf:true},
-    {n:"Wok de Tofu Crocante con Vegetales", cat:"Veggie", k:340,p:24,c:22,f:18, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-    {n:"Hamburguesa de Porotos Negros", cat:"Veggie", k:280,p:14,c:36,f:8, gf:false, note:"Usar avena certificada sin gluten y pan sin TACC"},
-    {n:"Chili Vegano de Porotos", cat:"Veggie", k:360,p:18,c:50,f:8, gf:true},
-    {n:"Pad Thai Vegano", cat:"Veggie", k:420,p:16,c:52,f:16, gf:false, note:"Ya usa fideos de arroz — solo cambiar la salsa de soja por tamari"},
-    {n:"Pizza de Coliflor", cat:"Veggie", k:320,p:18,c:20,f:18, gf:true},
-    {n:"Wrap de Hummus con Vegetales Asados", cat:"Veggie", k:380,p:14,c:42,f:16, gf:false, note:"Usar tortilla sin TACC (o de maíz)"},
-    {n:"Sopa de Calabaza y Jengibre", cat:"Veggie", k:200,p:6,c:32,f:6, gf:true},
-    {n:"Ñoquis de Batata con Salsa de Salvia", cat:"Veggie", k:420,p:12,c:68,f:10, gf:false, note:"Usar harina de arroz o premezcla sin TACC"},
-    {n:"Bowl de Arroz con Edamames y Palta", cat:"Veggie", k:460,p:18,c:52,f:20, gf:false, note:"Usar tamari o salsa de soja sin TACC"},
-  ];
-  const RECIPE_CATS = ["Desayuno","Almuerzo","Cena","Snack","Postre","Veggie"];
+  // Alimentos personalizados que el usuario carga manualmente (no estaban en la base).
+  // Se guardan en el dispositivo para que la próxima vez aparezcan en el buscador.
+  const CUSTOM_FOOD_KEY = "bitacora_custom_foods_v1";
+  function loadCustomFoods(){
+    try{ const raw = localStorage.getItem(CUSTOM_FOOD_KEY); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveCustomFoods(list){
+    try{ localStorage.setItem(CUSTOM_FOOD_KEY, JSON.stringify(list)); }
+    catch(e){ /* almacenamiento lleno, se ignora */ }
+  }
+  let customFoods = loadCustomFoods();
 
-  function findRecipe(name){ return RECIPE_DB.find(r=>r.n===name); }
-  function sumRecipes(names){
-    return names.reduce((acc,name)=>{
-      const r = findRecipe(name);
-      if(r){ acc.kcal+=r.k; acc.p+=r.p; acc.c+=r.c; acc.f+=r.f; }
-      return acc;
-    }, {kcal:0,p:0,c:0,f:0});
+  function rememberCustomFood(name, kcal, protein, carbs, fat, grams){
+    const key = normalize(name);
+    const already = customFoods.some(f=> normalize(f.n)===key);
+    if(already) return;
+    let entry;
+    if(grams && grams>0){
+      const factor = 100/grams;
+      entry = {n:name, k:Math.round(kcal*factor*10)/10, p:Math.round(protein*factor*10)/10,
+        c:Math.round(carbs*factor*10)/10, f:Math.round(fat*factor*10)/10, unit:grams, custom:true};
+    } else {
+      entry = {n:name, k:kcal, p:protein, c:carbs, f:fat, unit:null, custom:true};
+    }
+    customFoods.push(entry);
+    saveCustomFoods(customFoods);
   }
 
-  // Planes de un día completo, mezclando recetas ya aptas o adaptadas.
-  const DAY_PLANS = [
-    {
-      name:"Déficit", tag:"Bajar grasa", color:"var(--brick)",
-      items:[
-        {recipe:"Tostadas de Huevo y Palta", meal:"Desayuno", time:"08:00"},
-        {recipe:"Bowl de Garbanzos y Pollo", meal:"Almuerzo", time:"13:00"},
-        {recipe:"Yogur con Proteína y Berries", meal:"Snack", time:"17:00"},
-        {recipe:"Pollo al Verdeo", meal:"Cena", time:"20:30"},
-        {recipe:"Mousse de Chocolate", meal:"Snack", time:"21:30"},
-      ]
-    },
-    {
-      name:"Mantenimiento", tag:"Peso estable", color:"var(--green)",
-      items:[
-        {recipe:"Bowl de Yogur Griego con Granola", meal:"Desayuno", time:"08:00"},
-        {recipe:"Bowl de Pollo Teriyaki con Arroz y Brócoli", meal:"Almuerzo", time:"13:00"},
-        {recipe:"Mix de Frutos Secos", meal:"Snack", time:"17:00"},
-        {recipe:"Pechuga Rellena de Espinaca y Queso", meal:"Cena", time:"20:30"},
-        {recipe:"Tiramisú Fit sin Horno", meal:"Snack", time:"21:30"},
-      ]
-    },
-    {
-      name:"Superávit", tag:"Ganar músculo", color:"var(--amber)",
-      items:[
-        {recipe:"Overnight Oats de Chocolate", meal:"Desayuno", time:"08:00"},
-        {recipe:"Bowl de Salmón con Quinoa", meal:"Almuerzo", time:"13:00"},
-        {recipe:"Shake de Vainilla", meal:"Snack", time:"16:30"},
-        {recipe:"Rollitos de Pavo", meal:"Snack", time:"18:00"},
-        {recipe:"Ensalada Tibia de Garbanzos y Pollo", meal:"Cena", time:"20:30"},
-        {recipe:"Trufas de Chocolate y Proteína", meal:"Snack", time:"21:30"},
-      ]
-    },
-    {
-      name:"Veggie", tag:"100% sin carne", color:"var(--green)",
-      items:[
-        {recipe:"Chia Pudding de Chocolate", meal:"Desayuno", time:"08:00"},
-        {recipe:"Buddha Bowl Vegano de Garbanzos", meal:"Almuerzo", time:"13:00"},
-        {recipe:"Tostadas de Arroz con Maní y Banana", meal:"Snack", time:"17:00"},
-        {recipe:"Mix de Frutos Secos", meal:"Snack", time:"18:30"},
-        {recipe:"Chili Vegano de Porotos", meal:"Cena", time:"20:30"},
-        {recipe:"Helado de Proteína", meal:"Snack", time:"21:30"},
-      ]
-    },
+  // Actividades comunes con gasto calórico cada 30 min (de tu informe de composición corporal,
+  // calculado para tu peso). Sirve como base — se escala según los minutos que cargues.
+  const EXERCISE_DB = [
+    {n:"Caminar", per30:154},
+    {n:"Caminar rápido", per30:222},
+    {n:"Correr despacio", per30:269},
+    {n:"Saltar la soga", per30:484},
+    {n:"Bicicleta", per30:230},
+    {n:"Nadar", per30:269},
+    {n:"Yoga", per30:154},
+    {n:"Subir escaleras", per30:161},
+    {n:"Escalar / trekking", per30:322},
+    {n:"Básquet", per30:230},
+    {n:"Pesas / gimnasio", per30:200},
+    {n:"Fútbol", per30:280},
   ];
 
   const $ = (sel, root) => (root||document).querySelector(sel);
@@ -966,6 +923,16 @@
     $("#mP").textContent = Math.round(t.p)+"g";
     $("#mC").textContent = Math.round(t.c)+"g";
     $("#mF").textContent = Math.round(t.f)+"g";
+
+    const burned = exerciseTotalKcal(currentDate);
+    const net = t.kcal - burned;
+    $("#balanceRow").innerHTML = `
+      <div class="balance-item"><div class="bi-n tabular">${Math.round(t.kcal)}</div><div class="bi-l">Consumido</div></div>
+      <div class="balance-div"></div>
+      <div class="balance-item"><div class="bi-n tabular" style="color:var(--brick);">${burned>0?"-":""}${Math.round(burned)}</div><div class="bi-l">Ejercicio</div></div>
+      <div class="balance-div"></div>
+      <div class="balance-item"><div class="bi-n tabular ${target ? (net>target?'neg':'pos') : ''}">${Math.round(net)}</div><div class="bi-l">Balance neto</div></div>
+    `;
   }
 
   function renderList(entries){
@@ -1028,6 +995,7 @@
     const entries = entriesForDate(currentDate);
     renderSummary(entries);
     renderList(entries);
+    renderExerciseSection();
   }
 
   /* ---------- date nav ---------- */
@@ -1070,8 +1038,18 @@
     $("#fSearch").value = "";
     $("#searchResults").innerHTML = "";
     $("#sfName").textContent = food.n;
-    $("#fGrams").value = food.unit || 100;
-    renderQuickGrams(food);
+    if(food.unit){
+      $("#fGrams").closest("label").style.display = "";
+      $("#fGrams").value = food.unit;
+      renderQuickGrams(food);
+      $("#quickGrams").style.display = "";
+    } else {
+      // alimento de porción fija (guardado manualmente sin gramos) — no se escala
+      $("#fGrams").closest("label").style.display = "none";
+      $("#fGrams").value = 100;
+      $("#quickGrams").innerHTML = "";
+      $("#quickGrams").style.display = "none";
+    }
     $("#selectedFoodBox").style.display = "";
     updatePreview();
   }
@@ -1093,6 +1071,10 @@
 
   function updatePreview(){
     if(!selectedFood) return;
+    if(!selectedFood.unit){
+      $("#sfPreview").textContent = `≈ ${Math.round(selectedFood.k)} kcal · P ${selectedFood.p}g · C ${selectedFood.c}g · G ${selectedFood.f}g (porción fija)`;
+      return;
+    }
     const g = Number($("#fGrams").value) || 0;
     const factor = g/100;
     const kcal = selectedFood.k*factor, p = selectedFood.p*factor, c = selectedFood.c*factor, f = selectedFood.f*factor;
@@ -1104,7 +1086,8 @@
     const q = normalize($("#fSearch").value.trim());
     const box = $("#searchResults");
     if(q.length < 2){ box.innerHTML = ""; return; }
-    const results = FOOD_DB.filter(f=> normalize(f.n).includes(q)).slice(0,6);
+    const pool = customFoods.concat(FOOD_DB);
+    const results = pool.filter(f=> normalize(f.n).includes(q)).slice(0,6);
     if(results.length === 0){
       box.innerHTML = `<button type="button" disabled style="color:var(--ink-faint);">Sin resultados · probá "Carga manual"</button>`;
       return;
@@ -1113,7 +1096,8 @@
     results.forEach(food=>{
       const b = document.createElement("button");
       b.type = "button";
-      b.innerHTML = `<span>${food.n}</span><span class="k">${food.k} kcal/100g</span>`;
+      const rightLabel = food.unit ? (food.k + " kcal/100g") : (food.k + " kcal");
+      b.innerHTML = `<span>${food.custom ? '<span class="mine-badge">Mío</span> ' : ''}${food.n}</span><span class="k">${rightLabel}</span>`;
       b.addEventListener("click", ()=> pickFood(food));
       box.appendChild(b);
     });
@@ -1123,6 +1107,13 @@
   function buildItemFromForm(){
     if(entryMode === "db"){
       if(!selectedFood) return {error:"Buscá y elegí un alimento de la lista"};
+      if(!selectedFood.unit){
+        // porción fija (alimento personalizado sin gramos)
+        return {item:{
+          name: selectedFood.n,
+          kcal: selectedFood.k, protein: selectedFood.p, carbs: selectedFood.c, fat: selectedFood.f
+        }};
+      }
       const g = Number($("#fGrams").value);
       if(!g || g<=0) return {error:"Cargá la cantidad en gramos"};
       const factor = g/100;
@@ -1138,12 +1129,14 @@
       const kcal = Number($("#fKcal").value);
       if(!name) return {error:"Poné el nombre del alimento"};
       if(!kcal || kcal<=0) return {error:"Cargá las calorías"};
-      return {item:{
-        name, kcal,
-        protein: Number($("#fProt").value)||0,
-        carbs: Number($("#fCarb").value)||0,
-        fat: Number($("#fFat").value)||0
-      }};
+      const protein = Number($("#fProt").value)||0;
+      const carbs = Number($("#fCarb").value)||0;
+      const fat = Number($("#fFat").value)||0;
+      if($("#fRemember").checked){
+        const grams = Number($("#fManualGrams").value)||0;
+        rememberCustomFood(name, kcal, protein, carbs, fat, grams);
+      }
+      return {item:{ name, kcal, protein, carbs, fat }};
     }
   }
 
@@ -1153,6 +1146,7 @@
     } else {
       $("#fNameManual").value = "";
       $("#fKcal").value = "";
+      $("#fManualGrams").value = "";
       $("#fProt").value = "";
       $("#fCarb").value = "";
       $("#fFat").value = "";
@@ -1200,6 +1194,8 @@
     renderPlate();
     $("#fNameManual").value = "";
     $("#fKcal").value = "";
+    $("#fManualGrams").value = "";
+    $("#fRemember").checked = true;
     $("#fTime").value = nowTime();
     $("#fProt").value = "";
     $("#fCarb").value = "";
@@ -1291,11 +1287,11 @@
       const tab = btn.dataset.tab;
       if(tab === "history"){ renderHistory(); openSheet("historyOverlay"); }
       else if(tab === "export"){ openSheet("exportOverlay"); }
-      else if(tab === "recipes"){ renderDayPlans(); renderRecipeList(); openSheet("recipesOverlay"); }
+      else if(tab === "report"){ renderReport(); openSheet("reportOverlay"); }
     });
   });
   // reset nav to "Hoy" whenever a modal that isn't a tab target closes
-  ["historyOverlay","exportOverlay","recipesOverlay"].forEach(id=>{
+  ["historyOverlay","exportOverlay","reportOverlay"].forEach(id=>{
     $("#"+id).addEventListener("click",(e)=>{
       if(e.target.closest("[data-close]") || e.target.id===id){
         $all("nav.bottom button").forEach(b=> b.classList.toggle("active", b.dataset.tab==="today"));
@@ -1333,106 +1329,217 @@
     });
   }
 
-  /* ---------- recetas ---------- */
-  let recipeCatFilter = "Todas";
+  /* ---------- ejercicio ---------- */
+  const EXERCISE_KEY = "bitacora_exercise_log_v1";
+  function loadExerciseData(){
+    try{ const raw = localStorage.getItem(EXERCISE_KEY); return raw ? JSON.parse(raw) : {}; }
+    catch(e){ return {}; }
+  }
+  function saveExerciseData(d){
+    try{ localStorage.setItem(EXERCISE_KEY, JSON.stringify(d)); }
+    catch(e){ showToast("No se pudo guardar el ejercicio"); }
+  }
+  let exerciseData = loadExerciseData();
 
-  function gfBadge(r){
-    if(r.gf) return `<span class="gf-badge gf-ok">Sin TACC</span>`;
-    return `<span class="gf-badge gf-swap">Adaptar</span>`;
+  function exerciseForDate(dstr){
+    return (exerciseData[dstr] || []).slice().sort((a,b)=> a.time.localeCompare(b.time));
+  }
+  function exerciseTotalKcal(dstr){
+    return exerciseForDate(dstr).reduce((s,e)=> s + (Number(e.kcal)||0), 0);
   }
 
-  function addRecipeToLog(r, opts){
-    opts = opts || {};
-    const meal = opts.meal || (r.cat==="Postre" ? "Snack" : (r.cat==="Veggie" ? "Almuerzo" : r.cat));
-    const time = opts.time || nowTime();
-    const notes = r.gf ? "" : ("Adaptar sin TACC: " + r.note);
-    data[currentDate] = data[currentDate] || [];
-    data[currentDate].push({
-      id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-      name: r.n, kcal: r.k,
-      time, meal,
-      protein: r.p, carbs: r.c, fat: r.f,
-      notes,
-      loggedAt: new Date().toISOString()
+  let exSelectedActivity = null;
+  let exMode = "common";
+
+  function renderExActivityChips(){
+    const box = $("#exActivityChips");
+    box.innerHTML = "";
+    EXERCISE_DB.forEach(a=>{
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = a.n;
+      b.addEventListener("click", ()=>{
+        exSelectedActivity = a;
+        $all(".chip", box).forEach(c=> c.classList.toggle("sel", c===b));
+        $("#exSelName").textContent = a.n;
+        $("#exPer30").textContent = a.per30;
+        $("#exMinutes").value = 30;
+        $("#exSelectedBox").style.display = "";
+        updateExPreview();
+      });
+      box.appendChild(b);
     });
   }
+  function updateExPreview(){
+    if(!exSelectedActivity) return;
+    const min = Number($("#exMinutes").value) || 0;
+    const kcal = Math.round(exSelectedActivity.per30 * (min/30));
+    $("#exPreview").textContent = `≈ ${kcal} kcal quemadas`;
+  }
+  $("#exMinutes").addEventListener("input", updateExPreview);
+  $all(".chip.qty", $("#exQuickMin")).forEach(chip=>{
+    chip.addEventListener("click", ()=>{ $("#exMinutes").value = chip.dataset.m; updateExPreview(); });
+  });
 
-  function renderDayPlans(){
-    const root = $("#dayPlans");
-    root.innerHTML = "";
-    DAY_PLANS.forEach(plan=>{
-      const totals = sumRecipes(plan.items.map(i=>i.recipe));
-      const allGf = plan.items.every(i=>{ const r=findRecipe(i.recipe); return r && r.gf; });
-      const card = document.createElement("div");
-      card.className = "plan-card";
-      card.style.setProperty("--plan-color", plan.color);
-      card.innerHTML = `
-        <div class="plan-top">
-          <div>
-            <div class="plan-name">${plan.name}</div>
-            <div class="plan-tag">${plan.tag}${allGf ? " · 100% sin TACC" : ""}</div>
+  $all(".chip", $("#exModeChips")).forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      exMode = chip.dataset.mode;
+      $all(".chip", $("#exModeChips")).forEach(c=> c.classList.toggle("sel", c===chip));
+      $("#exCommonMode").style.display = exMode==="common" ? "" : "none";
+      $("#exManualMode").style.display = exMode==="manual" ? "" : "none";
+    });
+  });
+
+  function openAddExercise(){
+    exMode = "common";
+    exSelectedActivity = null;
+    $all(".chip", $("#exModeChips")).forEach((c,i)=> c.classList.toggle("sel", i===0));
+    $("#exCommonMode").style.display = "";
+    $("#exManualMode").style.display = "none";
+    $("#exSelectedBox").style.display = "none";
+    renderExActivityChips();
+    $("#exNameManual").value = "";
+    $("#exKcalManual").value = "";
+    $("#exMinutesManual").value = "30";
+    $("#exTime").value = nowTime();
+    openSheet("addExerciseOverlay");
+  }
+
+  $("#saveExercise").addEventListener("click", ()=>{
+    const time = $("#exTime").value || nowTime();
+    let entry;
+    if(exMode === "common"){
+      if(!exSelectedActivity){ showToast("Elegí una actividad"); return; }
+      const min = Number($("#exMinutes").value);
+      if(!min || min<=0){ showToast("Cargá la duración"); return; }
+      entry = {
+        id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+        name: exSelectedActivity.n, minutes: min,
+        kcal: Math.round(exSelectedActivity.per30 * (min/30)),
+        time, loggedAt: new Date().toISOString()
+      };
+    } else {
+      const name = $("#exNameManual").value.trim();
+      const kcal = Number($("#exKcalManual").value);
+      if(!name){ showToast("Poné el nombre de la actividad"); return; }
+      if(!kcal || kcal<=0){ showToast("Cargá las calorías quemadas"); return; }
+      entry = {
+        id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+        name, minutes: Number($("#exMinutesManual").value)||null,
+        kcal, time, loggedAt: new Date().toISOString()
+      };
+    }
+    exerciseData[currentDate] = exerciseData[currentDate] || [];
+    exerciseData[currentDate].push(entry);
+    saveExerciseData(exerciseData);
+    closeSheet("addExerciseOverlay");
+    render();
+    showToast("Ejercicio registrado ✓");
+  });
+
+  function renderExerciseSection(){
+    const wrap = $("#exerciseSection");
+    const entries = exerciseForDate(currentDate);
+    let html = `<button type="button" class="add-exercise-btn" id="addExerciseBtn">+ Agregar ejercicio</button>`;
+    if(entries.length){
+      html += entries.map(e=> `
+        <div class="exercise-entry">
+          <div class="time tabular">${e.time}</div>
+          <div class="info">
+            <div class="name">${escapeHtml(e.name)}</div>
+            ${e.minutes ? `<div class="sub">${e.minutes} min</div>` : ""}
           </div>
-          <div class="plan-kcal tabular">${Math.round(totals.kcal)}<span>kcal</span></div>
-        </div>
-        <div class="plan-items">${plan.items.map(i=>{
-          const r = findRecipe(i.recipe);
-          return `<div class="plan-item"><span class="pi-meal">${i.meal}</span><span class="pi-name">${r?r.n:i.recipe}</span>${(r&&!r.gf)?'<span class="gf-dot"></span>':''}</div>`;
-        }).join("")}</div>
-        <div class="plan-macros">P ${Math.round(totals.p)}g · C ${Math.round(totals.c)}g · G ${Math.round(totals.f)}g</div>
-        <button type="button" class="primary-btn plan-use" style="margin-top:10px;">Usar este día</button>
-      `;
-      card.querySelector(".plan-use").addEventListener("click", ()=>{
-        plan.items.forEach(i=>{
-          const r = findRecipe(i.recipe);
-          if(r) addRecipeToLog(r, {meal:i.meal, time:i.time});
-        });
-        saveData(data);
+          <div class="kcal tabular">-${Math.round(e.kcal)}</div>
+          <button class="del" data-exid="${e.id}" aria-label="Eliminar">✕</button>
+        </div>`).join("");
+    }
+    wrap.innerHTML = html;
+    $("#addExerciseBtn").addEventListener("click", openAddExercise);
+    $all(".del", wrap).forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.getAttribute("data-exid");
+        exerciseData[currentDate] = (exerciseData[currentDate]||[]).filter(e=> e.id !== id);
+        if(exerciseData[currentDate].length === 0) delete exerciseData[currentDate];
+        saveExerciseData(exerciseData);
         render();
-        closeSheet("recipesOverlay");
-        $all("nav.bottom button").forEach(b=> b.classList.toggle("active", b.dataset.tab==="today"));
-        showToast("Día cargado: " + plan.name + " ✓");
-      });
-      root.appendChild(card);
-    });
-  }
-
-  function renderRecipeCatChips(){
-    const box = $("#recipeCatChips");
-    box.innerHTML = `<button type="button" class="chip ${recipeCatFilter==="Todas"?"sel":""}" data-cat="Todas">Todas</button>` +
-      RECIPE_CATS.map(c=> `<button type="button" class="chip ${recipeCatFilter===c?"sel":""}" data-cat="${c}">${c}</button>`).join("");
-    $all(".chip", box).forEach(chip=>{
-      chip.addEventListener("click", ()=>{
-        recipeCatFilter = chip.dataset.cat;
-        renderRecipeCatChips();
-        renderRecipeList();
+        showToast("Ejercicio eliminado");
       });
     });
   }
 
-  function renderRecipeList(){
-    const root = $("#recipeList");
-    const list = RECIPE_DB.filter(r=> recipeCatFilter==="Todas" || r.cat===recipeCatFilter);
-    root.innerHTML = "";
-    list.forEach(r=>{
-      const row = document.createElement("div");
-      row.className = "recipe-row";
-      row.innerHTML = `
-        <div class="rr-main">
-          <div class="rr-name">${r.n} ${gfBadge(r)}</div>
-          <div class="rr-macros">${r.k} kcal · P ${r.p}g · C ${r.c}g · G ${r.f}g</div>
-          ${r.note ? `<div class="rr-note">${r.note}</div>` : ""}
-        </div>
-        <button type="button" class="rr-add" aria-label="Agregar">+</button>
-      `;
-      row.querySelector(".rr-add").addEventListener("click", ()=>{
-        addRecipeToLog(r);
-        saveData(data);
-        render();
-        showToast(r.n + " agregado ✓");
-      });
-      root.appendChild(row);
-    });
+  /* ---------- informe ---------- */
+  const HOUR_BUCKETS = [
+    [0,6,"00-06"],[6,8,"06-08"],[8,10,"08-10"],[10,12,"10-12"],[12,14,"12-14"],
+    [14,16,"14-16"],[16,18,"16-18"],[18,20,"18-20"],[20,22,"20-22"],[22,24,"22-24"]
+  ];
+  let reportRange = "day";
+
+  function daysInRange(range){
+    const all = Object.keys(data).sort();
+    if(range === "day") return [currentDate];
+    if(range === "all") return all;
+    const n = range==="week" ? 7 : 30;
+    const end = new Date(currentDate+"T00:00:00");
+    const cutoff = new Date(end); cutoff.setDate(cutoff.getDate()-(n-1));
+    return all.filter(d=> { const dt=new Date(d+"T00:00:00"); return dt>=cutoff && dt<=end; });
   }
+
+  function renderReport(){
+    $all("#reportRange button").forEach(b=> b.classList.toggle("sel", b.dataset.range===reportRange));
+    const days = daysInRange(reportRange).filter(d=> (data[d]||[]).length>0);
+    const body = $("#reportBody");
+    if(days.length === 0){
+      body.innerHTML = `<div class="report-empty">No hay registros en este rango todavía.</div>`;
+      return;
+    }
+    // acumular kcal por franja horaria
+    const buckets = HOUR_BUCKETS.map(()=>0);
+    let grandKcal = 0;
+    days.forEach(d=>{
+      entriesForDate(d).forEach(e=>{
+        const h = Number((e.time||"00:00").split(":")[0]);
+        const idx = HOUR_BUCKETS.findIndex(b=> h>=b[0] && h<b[1]);
+        if(idx>=0) buckets[idx] += Number(e.kcal)||0;
+        grandKcal += Number(e.kcal)||0;
+      });
+    });
+    const avgBuckets = buckets.map(v=> v/days.length);
+    const maxB = Math.max(...avgBuckets, 1);
+    const avgDaily = grandKcal/days.length;
+    const totalExercise = days.reduce((s,d)=> s+exerciseTotalKcal(d), 0);
+    const avgExercise = totalExercise/days.length;
+
+    const rangeLabel = reportRange==="day"?"hoy":reportRange==="week"?"últimos 7 días":reportRange==="month"?"últimos 30 días":"todo el historial";
+
+    body.innerHTML = `
+      <div class="report-summary">
+        <div><div class="rs-n tabular">${Math.round(avgDaily)}</div><div class="rs-l">kcal/día prom.</div></div>
+        <div><div class="rs-n tabular">${Math.round(avgExercise)}</div><div class="rs-l">quemadas/día</div></div>
+        <div><div class="rs-n tabular">${days.length}</div><div class="rs-l">día${days.length===1?"":"s"} con datos</div></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Consumo promedio por franja horaria (${rangeLabel})</div>
+        <div class="bar-chart">
+          ${HOUR_BUCKETS.map((b,i)=>{
+            const v = avgBuckets[i];
+            const hpct = Math.max((v/maxB)*100, v>0?4:0);
+            return `<div class="bar-col">
+              <div class="bar-val">${v>0?Math.round(v):""}</div>
+              <div class="bar" style="height:${hpct}%"></div>
+              <div class="bar-label">${b[2]}</div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+  $all("#reportRange button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      reportRange = btn.dataset.range;
+      renderReport();
+    });
+  });
 
   /* ---------- export ---------- */
   function allDaysSorted(){
@@ -1443,21 +1550,24 @@
     const days = allDaysSorted();
     if(days.length === 0) return "Todavía no hay registros cargados en la bitácora.";
     let out = "";
-    out += "BITÁCORA DE ALIMENTACIÓN — resumen para análisis\n";
+    out += "BITÁCORA DE ALIMENTACIÓN Y EJERCICIO — resumen para análisis\n";
     out += "Generado: " + new Date().toLocaleString("es-AR") + "\n";
     if(target) out += "Objetivo diario: " + target + " kcal\n";
     out += "Días registrados: " + days.length + "\n";
     out += "=".repeat(48) + "\n\n";
 
-    let grand = {kcal:0,p:0,c:0,f:0,n:0};
+    let grand = {kcal:0,p:0,c:0,f:0,n:0,burned:0};
     days.forEach(dstr=>{
       const entries = entriesForDate(dstr);
       const t = totals(entries);
-      grand.kcal+=t.kcal; grand.p+=t.p; grand.c+=t.c; grand.f+=t.f; grand.n+=entries.length;
+      const ex = exerciseForDate(dstr);
+      const burned = exerciseTotalKcal(dstr);
+      grand.kcal+=t.kcal; grand.p+=t.p; grand.c+=t.c; grand.f+=t.f; grand.n+=entries.length; grand.burned+=burned;
       out += fmtDateFull(dstr).toUpperCase() + " (" + dstr + ")\n";
-      out += "Total: " + Math.round(t.kcal) + " kcal | P " + Math.round(t.p) + "g · C " + Math.round(t.c) + "g · G " + Math.round(t.f) + "g";
+      out += "Consumido: " + Math.round(t.kcal) + " kcal | P " + Math.round(t.p) + "g · C " + Math.round(t.c) + "g · G " + Math.round(t.f) + "g";
       if(target) out += " | vs objetivo: " + (t.kcal-target>=0? "+":"") + Math.round(t.kcal-target) + " kcal";
       out += "\n";
+      if(burned>0) out += "Ejercicio: -" + Math.round(burned) + " kcal | Balance neto: " + Math.round(t.kcal-burned) + " kcal\n";
       entries.forEach(e=>{
         out += "  " + e.time + "  [" + (e.meal||"Otro") + "]  " + e.name + " — " + Math.round(e.kcal) + " kcal";
         const bits = [];
@@ -1468,13 +1578,18 @@
         if(e.notes) out += "  · nota: " + e.notes;
         out += "\n";
       });
+      ex.forEach(x=>{
+        out += "  " + x.time + "  [Ejercicio] " + x.name + (x.minutes?" ("+x.minutes+" min)":"") + " — -" + Math.round(x.kcal) + " kcal\n";
+      });
       out += "\n";
     });
 
     out += "=".repeat(48) + "\n";
     out += "RESUMEN GLOBAL (" + days.length + " día" + (days.length===1?"":"s") + ", " + grand.n + " registros)\n";
-    out += "Promedio diario: " + Math.round(grand.kcal/days.length) + " kcal | P " + Math.round(grand.p/days.length) + "g · C " + Math.round(grand.c/days.length) + "g · G " + Math.round(grand.f/days.length) + "g\n";
-    out += "\nPor favor analizá esta bitácora: patrones de horarios, distribución calórica a lo largo del día, balance de macronutrientes, y cualquier recomendación relevante según estos datos.\n";
+    out += "Promedio diario consumido: " + Math.round(grand.kcal/days.length) + " kcal | P " + Math.round(grand.p/days.length) + "g · C " + Math.round(grand.c/days.length) + "g · G " + Math.round(grand.f/days.length) + "g\n";
+    out += "Promedio diario quemado en ejercicio: " + Math.round(grand.burned/days.length) + " kcal\n";
+    out += "Balance neto promedio: " + Math.round((grand.kcal-grand.burned)/days.length) + " kcal/día\n";
+    out += "\nPor favor analizá esta bitácora: patrones de horarios, distribución calórica a lo largo del día, balance de macronutrientes, relación entre ejercicio y consumo, y cualquier recomendación relevante según estos datos.\n";
     return out;
   }
 
@@ -1500,18 +1615,22 @@
   });
 
   $("#expJSON").addEventListener("click", ()=>{
-    const payload = { generatedAt: new Date().toISOString(), dailyTargetKcal: target || null, days: {} };
+    const payload = { generatedAt: new Date().toISOString(), dailyTargetKcal: target || null, days: {}, exercise: {} };
     allDaysSorted().forEach(dstr=>{ payload.days[dstr] = entriesForDate(dstr); });
+    Object.keys(exerciseData).sort().forEach(dstr=>{ payload.exercise[dstr] = exerciseForDate(dstr); });
     downloadFile("bitacora_alimentacion_"+todayStr()+".json", JSON.stringify(payload, null, 2), "application/json");
     showToast("JSON descargado");
     closeSheet("exportOverlay");
   });
 
   $("#expCSV").addEventListener("click", ()=>{
-    const rows = [["fecha","hora","momento","alimento","kcal","proteinas_g","carbohidratos_g","grasas_g","notas"]];
+    const rows = [["tipo","fecha","hora","momento","nombre","kcal","proteinas_g","carbohidratos_g","grasas_g","notas"]];
     allDaysSorted().forEach(dstr=>{
       entriesForDate(dstr).forEach(e=>{
-        rows.push([dstr, e.time, e.meal||"", e.name, e.kcal, e.protein||0, e.carbs||0, e.fat||0, e.notes||""]);
+        rows.push(["comida", dstr, e.time, e.meal||"", e.name, e.kcal, e.protein||0, e.carbs||0, e.fat||0, e.notes||""]);
+      });
+      exerciseForDate(dstr).forEach(x=>{
+        rows.push(["ejercicio", dstr, x.time, x.minutes?x.minutes+" min":"", x.name, -Math.round(x.kcal), "", "", "", ""]);
       });
     });
     const csv = rows.map(r=> r.map(v=>{
