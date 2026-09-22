@@ -260,6 +260,42 @@
   .export-opt .tx{flex:1;}
   .export-opt .tx .t{font-size:14px;font-weight:700;color:var(--ink);}
   .export-opt .tx .d{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+
+  /* restore section */
+  .sheet-divider{
+    display:flex;align-items:center;gap:10px;margin:18px 0 10px;
+  }
+  .sheet-divider span{
+    font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);
+  }
+  .sheet-divider::after{content:"";flex:1;height:1px;background:var(--line);}
+  .restore-hint{font-size:11.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:10px;}
+  .restore-text{
+    width:100%;min-height:96px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;
+    font-size:13px;font-family:inherit;color:var(--ink);background:var(--surface);resize:vertical;margin-bottom:8px;
+  }
+  .restore-btn{
+    width:100%;border:1px dashed var(--line);background:var(--surface);color:var(--ink);
+    border-radius:12px;padding:12px;font-size:13.5px;font-weight:700;margin-bottom:8px;
+  }
+  .backup-status{font-size:11.5px;color:var(--ink-soft);margin-top:4px;line-height:1.5;}
+
+  /* weekly backup banner */
+  .backup-banner{
+    display:none;align-items:center;gap:10px;background:var(--amber-soft);color:var(--ink);
+    border-radius:13px;padding:12px 14px;margin:12px 18px 0;font-size:12.5px;line-height:1.4;
+  }
+  .backup-banner.show{display:flex;}
+  .backup-banner .ic{font-size:18px;flex:none;}
+  .backup-banner .tx{flex:1;}
+  .backup-banner b{display:block;font-weight:800;margin-bottom:1px;}
+  .backup-banner button{
+    flex:none;background:var(--amber);color:#fff;border:none;border-radius:9px;
+    padding:8px 10px;font-size:12px;font-weight:800;
+  }
+  .backup-banner .dismiss{
+    background:none;color:var(--ink-soft);padding:8px 4px;font-weight:700;
+  }
   .toast{
     position:fixed;left:50%;bottom:100px;transform:translateX(-50%);
     background:var(--ink);color:#fff;font-size:13px;font-weight:600;
@@ -354,6 +390,13 @@
     </div>
   </div>
 </header>
+
+<div class="backup-banner" id="backupBanner">
+  <span class="ic">🗂️</span>
+  <span class="tx"><b>Backup semanal pendiente</b>Hace más de 7 días que no se descarga una copia de tus datos.</span>
+  <button id="backupBannerGo">Descargar</button>
+  <button class="dismiss" id="backupBannerDismiss">Ahora no</button>
+</div>
 
 <div class="summary">
   <div class="summary-top">
@@ -636,6 +679,16 @@
     <span style="display:block;font-size:11.5px;color:var(--ink-soft);margin-top:6px;line-height:1.5;">
       Los tres formatos incluyen todos los días guardados en este dispositivo: alimento, hora, calorías y macronutrientes.
     </span>
+
+    <div class="sheet-divider"><span>Restaurar</span></div>
+    <div class="restore-hint">
+      Si perdiste datos, podés restaurarlos desde un JSON descargado antes, o pegando el texto que copiaste con "Copiar resumen para IA". Los días que traiga el backup reemplazan lo que haya guardado para esas mismas fechas; el resto de tu historial no se toca.
+    </div>
+    <button class="restore-btn" id="restoreFileBtn">📂 Restaurar desde archivo (.json)</button>
+    <input type="file" id="restoreFileInput" accept="application/json,.json" style="display:none;">
+    <textarea class="restore-text" id="restoreTextArea" placeholder="Pegá acá el texto del backup (el que copiaste con 'Copiar resumen para IA')..."></textarea>
+    <button class="restore-btn" id="restoreTextBtn">↩️ Restaurar desde este texto</button>
+    <div class="backup-status" id="backupStatus"></div>
   </div>
 </div>
 
@@ -1611,6 +1664,7 @@
       downloadFile("bitacora_resumen.txt", text, "text/plain");
       showToast("Descargado como archivo de texto");
     }
+    markBackupDone();
     closeSheet("exportOverlay");
   });
 
@@ -1620,6 +1674,7 @@
     Object.keys(exerciseData).sort().forEach(dstr=>{ payload.exercise[dstr] = exerciseForDate(dstr); });
     downloadFile("bitacora_alimentacion_"+todayStr()+".json", JSON.stringify(payload, null, 2), "application/json");
     showToast("JSON descargado");
+    markBackupDone();
     closeSheet("exportOverlay");
   });
 
@@ -1639,11 +1694,168 @@
     }).join(";")).join("\n");
     downloadFile("bitacora_alimentacion_"+todayStr()+".csv", "\uFEFF"+csv, "text/csv;charset=utf-8");
     showToast("CSV descargado");
+    markBackupDone();
     closeSheet("exportOverlay");
   });
 
+  /* ---------- restaurar backup ---------- */
+  function newId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+  // Reconstruye los datos a partir del texto que genera "Copiar resumen para IA"
+  // (el mismo formato que ves en pantalla cuando lo pegás en un chat).
+  function parseAISummaryText(text){
+    const lines = text.split(/\r?\n/);
+    const days = {};
+    const exercise = {};
+    let target = null;
+    let currentDay = null;
+
+    const dayHeaderRe = /\((\d{4}-\d{2}-\d{2})\)\s*$/;
+    const entryLineRe = /^ {2}(\d{2}:\d{2})\s+\[([^\]]+)\]\s+(.+?)\s+—\s+(.+)$/;
+    const targetRe = /^Objetivo diario:\s*([\d.]+)\s*kcal/;
+
+    lines.forEach(raw=>{
+      const line = raw.replace(/\s+$/,"");
+      if(!line) return;
+
+      const tMatch = line.match(targetRe);
+      if(tMatch){ target = Number(tMatch[1]); return; }
+
+      if(!line.startsWith(" ")){
+        const dMatch = line.match(dayHeaderRe);
+        if(dMatch){ currentDay = dMatch[1]; return; }
+      }
+
+      if(!currentDay) return;
+      const eMatch = line.match(entryLineRe);
+      if(!eMatch) return;
+      const time = eMatch[1], tag = eMatch[2], rawName = eMatch[3], rest = eMatch[4];
+
+      if(tag === "Ejercicio"){
+        let name = rawName.trim();
+        let minutes = null;
+        const mMin = name.match(/\((\d+)\s*min\)\s*$/);
+        if(mMin){ minutes = Number(mMin[1]); name = name.slice(0, mMin.index).trim(); }
+        const kMatch = rest.match(/^(-?[\d.]+)\s*kcal/);
+        const kcal = kMatch ? Math.abs(Number(kMatch[1])) : 0;
+        exercise[currentDay] = exercise[currentDay] || [];
+        exercise[currentDay].push({ id: newId(), name, minutes, kcal, time, loggedAt: new Date().toISOString() });
+      } else {
+        const fMatch = rest.match(/^(-?[\d.]+)\s*kcal(?:\s*\(([^)]*)\))?(?:\s*·\s*nota:\s*(.*))?$/);
+        if(!fMatch) return;
+        const kcal = Number(fMatch[1]);
+        let protein=0, carbs=0, fat=0;
+        if(fMatch[2]){
+          fMatch[2].split(",").forEach(part=>{
+            const pm = part.match(/([PCG])\s*([\d.]+)\s*g/);
+            if(!pm) return;
+            const v = Number(pm[2]);
+            if(pm[1]==="P") protein=v; else if(pm[1]==="C") carbs=v; else if(pm[1]==="G") fat=v;
+          });
+        }
+        const notes = fMatch[3] ? fMatch[3].trim() : "";
+        days[currentDay] = days[currentDay] || [];
+        days[currentDay].push({
+          id: newId(), name: rawName.trim(), kcal, time, meal: tag,
+          protein, carbs, fat, notes, loggedAt: new Date().toISOString()
+        });
+      }
+    });
+
+    return { dailyTargetKcal: target, days, exercise };
+  }
+
+  function doRestore(payload){
+    const dayCount = payload.days ? Object.keys(payload.days).length : 0;
+    const exCount = payload.exercise ? Object.keys(payload.exercise).length : 0;
+    if(dayCount===0 && exCount===0){ showToast("No se encontraron datos para restaurar"); return; }
+    const ok = confirm(
+      "Se van a reemplazar " + dayCount + " día(s) con los datos del backup.\n" +
+      "Lo que ya tengas cargado para esas mismas fechas se va a sobrescribir. ¿Continuar?"
+    );
+    if(!ok) return;
+    if(payload.days){
+      Object.keys(payload.days).forEach(d=>{ data[d] = payload.days[d]; });
+      saveData(data);
+    }
+    if(payload.exercise){
+      Object.keys(payload.exercise).forEach(d=>{ exerciseData[d] = payload.exercise[d]; });
+      saveExerciseData(exerciseData);
+    }
+    if(payload.dailyTargetKcal){
+      target = payload.dailyTargetKcal;
+      saveTarget(target);
+    }
+    markBackupDone();
+    render();
+    $("#restoreTextArea").value = "";
+    $("#backupStatus").textContent = "Restaurados " + dayCount + " día(s)" + (exCount ? " y ejercicio de " + exCount + " día(s)" : "") + ".";
+    showToast("Datos restaurados ✓");
+    closeSheet("exportOverlay");
+  }
+
+  $("#restoreFileBtn").addEventListener("click", ()=> $("#restoreFileInput").click());
+  $("#restoreFileInput").addEventListener("change", (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{ doRestore(JSON.parse(reader.result)); }
+      catch(err){ showToast("El archivo no es un JSON válido"); }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  $("#restoreTextBtn").addEventListener("click", ()=>{
+    const raw = $("#restoreTextArea").value.trim();
+    if(!raw){ showToast("Pegá el texto del backup primero"); return; }
+    let payload;
+    try{ payload = JSON.parse(raw); }
+    catch(err){ payload = parseAISummaryText(raw); }
+    doRestore(payload);
+  });
+
+  /* ---------- backup semanal ---------- */
+  const LAST_BACKUP_KEY = "bitacora_last_backup_date_v1";
+  const BANNER_DISMISS_KEY = "bitacora_backup_banner_dismiss_v1";
+
+  function markBackupDone(){
+    localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+    hideBackupBanner();
+  }
+  function daysSinceLastBackup(){
+    const v = localStorage.getItem(LAST_BACKUP_KEY);
+    if(!v) return Infinity;
+    return (Date.now() - new Date(v).getTime()) / 86400000;
+  }
+  function hideBackupBanner(){
+    const b = $("#backupBanner");
+    if(b) b.classList.remove("show");
+  }
+  function checkBackupBanner(){
+    if(Object.keys(data).length === 0) return; // nada que respaldar todavía
+    if(daysSinceLastBackup() < 7) return;
+    const dismissedOn = localStorage.getItem(BANNER_DISMISS_KEY);
+    if(dismissedOn === todayStr()) return; // ya lo cerró hoy, no insistimos hasta mañana
+    $("#backupBanner").classList.add("show");
+  }
+  $("#backupBannerGo")?.addEventListener("click", ()=>{
+    $("#expJSON").click();
+  });
+  $("#backupBannerDismiss")?.addEventListener("click", ()=>{
+    localStorage.setItem(BANNER_DISMISS_KEY, todayStr());
+    hideBackupBanner();
+  });
+
+  // pedirle al navegador que no borre el storage bajo presión de espacio
+  if(navigator.storage && navigator.storage.persist){
+    navigator.storage.persist().catch(()=>{});
+  }
+
   /* ---------- init ---------- */
   render();
+  checkBackupBanner();
 
   if("serviceWorker" in navigator){
     window.addEventListener("load", ()=>{
